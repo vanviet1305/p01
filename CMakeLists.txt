@@ -93,5 +93,12 @@ ament_target_dependencies(p01_simple rclcpp px4_msgs geometry_msgs std_msgs)
 target_link_libraries(p01_simple Eigen3::Eigen)
 install(TARGETS p01_simple DESTINATION lib/${PROJECT_NAME})
 
+# Node P02 đơn giản (PID hình học, arXiv:1304.6765v1): chép p01_simple, đổi lõi sang P02Controller. Chỉ dùng trong Gazebo.
+add_executable(p02_simple src/p02_simple.cpp)
+target_include_directories(p02_simple PRIVATE include)
+ament_target_dependencies(p02_simple rclcpp px4_msgs geometry_msgs std_msgs)
+target_link_libraries(p02_simple Eigen3::Eigen)
+install(TARGETS p02_simple DESTINATION lib/${PROJECT_NAME})
+
 # Đăng ký thông tin package với ament; giữ ở cuối cấu hình.
 ament_package()
