@@ -1,7 +1,7 @@
 // NODE P02 ĐƠN GIẢN — PID HÌNH HỌC (arXiv:1304.6765v1), CHỈ DÙNG TRONG GAZEBO
 //
 // Chép từ p01_simple, chỉ đổi lõi toán: P01 → P02Controller (thêm tích phân vị trí e_i, tư thế e_I).
-// Tích phân CHỈ cộng dồn ở đoạn hover/Case I (stage 3); đứng đất, đang lên, đang hạ thì giữ nguyên.
+// Tích phân cộng dồn từ lúc bắt đầu cất cánh tới hết hover/Case I (stage 7 và 3); trước cất cánh và lúc hạ thì giữ nguyên.
 // Phân bổ rotor, tham chiếu cất cánh, Case I, hạ cánh giống hệt p01_simple.
 // Cũng BỎ các lớp an toàn như p01_simple: không máy trạng thái, không dry-run, không chờ PX4 xác nhận,
 // không kiểm tra dữ liệu, không trộn lực khi khởi động motor.
@@ -181,10 +181,22 @@ private:
             ref.j = -ref.j;
             stage = 4;   // ghi CSV: đoạn hạ cánh
 
+            // Hết đa thức hạ cánh = đã chạm đất: xóa tích phân P02 (một lần), giống PX4 xóa tích phân khi đã đáp.
+            // Nếu giữ, k_i·e_i (~2,6 N khi khai 1,8 kg) làm lực trên đất còn ≈ 97% trọng lượng, UAV gần như lơ lửng.
+            if (tau >= LAND_TIME && !reset_on_ground_)
+            {
+                ctrl_.reset();
+                reset_on_ground_ = true;
+                RCLCPP_INFO(get_logger(), "Chạm đất: xóa tích phân P02 để giảm lực trước khi disarm");
+            }
+
             // Chạm đất xong 2 s thì disarm, thêm 1 s thì tắt node.
+            // Phải dùng disarm CƯỠNG BỨC (param2 = 21196). Log PX4 21/11: disarm thường luôn bị từ chối
+            // "Disarming denied: not landed" vì ở chế độ gửi lệnh motor trực tiếp, bộ phát hiện hạ cánh
+            // của PX4 không bao giờ báo đã đáp → node tắt → mất Offboard → failsafe Return (bay lên rồi đáp).
             if (tau >= LAND_TIME + 2.0 && !sent_disarm_)
             {
-                send_command(Command::VEHICLE_CMD_COMPONENT_ARM_DISARM, 0, 0);   // 0 = disarm thường
+                send_command(Command::VEHICLE_CMD_COMPONENT_ARM_DISARM, 0, 21196);   // 21196 = cưỡng bức
                 sent_disarm_ = true;
             }
             if (tau >= LAND_TIME + 3.0)
@@ -196,8 +208,10 @@ private:
         }
         last_ref_x_ = ref.x;
 
-        // 5. P02: trạng thái + tham chiếu → lực f, mômen M. Chỉ tích phân khi đang hover/Case I.
-        const bool integrate = use_integral_ && stage == 3;
+        // 5. P02: trạng thái + tham chiếu → lực f, mômen M.
+        // Tích phân từ lúc bắt đầu cất cánh (stage 7) để khử lệch trước khi bay Case I.
+        // Không tích phân lúc chờ trước cất cánh (stage 0) và lúc hạ cánh (stage 4, đích dưới mặt đất).
+        const bool integrate = use_integral_ && (stage == 7 || stage == 3);
         const P02Control c = ctrl_.compute(state_, params_, gains_, ref, dt, integrate);
 
         // 6. Phân bổ: f, M → 4 lệnh rotor u0..u3 (có giới hạn).
@@ -231,7 +245,7 @@ private:
         }
     }
 
-    // Gửi một lệnh VehicleCommand. Offboard: (DO_SET_MODE, 1, 6). Arm: (ARM_DISARM, 1, 0). Disarm: (ARM_DISARM, 0, 0).
+    // Gửi một lệnh VehicleCommand. Offboard: (DO_SET_MODE, 1, 6). Arm: (ARM_DISARM, 1, 0). Disarm cưỡng bức: (ARM_DISARM, 0, 21196).
     void send_command(uint32_t command, float p1, float p2)
     {
         Command msg{};
@@ -255,6 +269,7 @@ private:
     P02Gains gains_;
     P02Controller ctrl_;
     bool use_integral_ = true;
+    bool reset_on_ground_ = false;   // đã xóa tích phân lúc chạm đất chưa
     X500Actuators motors_;
     P01State state_;
     Vector3 origin_ = Vector3::Zero(), heading_ = Vector3::UnitX();
