@@ -58,6 +58,11 @@ public:
 
         // Tham số vật lý X500 và hệ số điều khiển: lấy nguyên bộ đã bay tốt.
         params_ = x500_parameters();
+        // mass_kg: khối lượng BỘ ĐIỀU KHIỂN tin là đúng (UAV thật trong Gazebo vẫn 2,064 kg).
+        // Khai sai = tạo nhiễu lực cố định để thử P01 / P02. Hệ số kx, kv tính theo khối lượng khai.
+        params_.m = declare_parameter<double>("mass_kg", params_.m);
+        params_.kx = 4.0 * params_.m;
+        params_.kv = 3.2 * params_.m;
 
         // 3 publisher gửi vào PX4 (/fmu/in) + telemetry cho rqt_plot/RViz.
         motor_pub_ = create_publisher<Motors>(px4_topic<Motors>("/fmu/in/actuator_motors"), rclcpp::SensorDataQoS());
@@ -79,7 +84,7 @@ public:
         // 1 timer 100 Hz: TOÀN BỘ việc điều khiển nằm trong loop().
         start_ = std::chrono::steady_clock::now();
         timer_ = create_wall_timer(std::chrono::milliseconds(10), [this]() { loop(); });
-        RCLCPP_INFO(get_logger(), "p01_simple: reference_mode=%s (CHỈ DÙNG TRONG MÔ PHỎNG)", mode_.c_str());
+        RCLCPP_INFO(get_logger(), "p01_simple: reference_mode=%s mass_kg=%.3f (CHỈ DÙNG TRONG MÔ PHỎNG)", mode_.c_str(), params_.m);
     }
 
 private:
