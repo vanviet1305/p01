@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/vector3_stamped.hpp>
 #include <std_msgs/msg/float64.hpp>
 
@@ -16,6 +17,7 @@ namespace uav_research
 class P01Telemetry
 {
     using Point = geometry_msgs::msg::PointStamped;
+    using Pose = geometry_msgs::msg::PoseStamped;
     using Vector = geometry_msgs::msg::Vector3Stamped;
     using Scalar = std_msgs::msg::Float64;
 
@@ -30,6 +32,9 @@ public:
             "/p01/error_ned", 10);
         norm_pub_ = node.create_publisher<Scalar>(
             "/p01/error_norm", 10);
+        // Vị trí + tư thế UAV (NED, thân FRD) để RViz vẽ mô hình UAV; xem p01_path_visualizer.
+        pose_pub_ = node.create_publisher<Pose>(
+            "/p01/pose_ned", 10);
     }
 
     void publish(
@@ -39,6 +44,21 @@ public:
         const P01Reference &reference,
         const P01Control &control)
     {
+        // Tư thế UAV phát ở mọi lần gọi (~100 Hz) để mô hình trong RViz chuyển động mượt.
+        // R đổi vectơ thân FRD sang hệ NED; quaternion lấy trực tiếp từ R.
+        Pose pose;
+        pose.header.stamp = stamp;
+        pose.header.frame_id = "map_ned";
+        pose.pose.position.x = state.x.x();
+        pose.pose.position.y = state.x.y();
+        pose.pose.position.z = state.x.z();
+        const Eigen::Quaterniond q(state.R);
+        pose.pose.orientation.w = q.w();
+        pose.pose.orientation.x = q.x();
+        pose.pose.orientation.y = q.y();
+        pose.pose.orientation.z = q.z();
+        pose_pub_->publish(pose);
+
         // Giới hạn dữ liệu hiển thị khoảng 10 Hz theo thời gian mẫu PX4.
         // Vòng tính điều khiển vẫn chạy theo mọi mẫu odometry hợp lệ.
         if (last_sample_ != 0 &&
@@ -82,6 +102,7 @@ private:
     rclcpp::Publisher<Point>::SharedPtr reference_pub_;
     rclcpp::Publisher<Vector>::SharedPtr error_pub_;
     rclcpp::Publisher<Scalar>::SharedPtr norm_pub_;
+    rclcpp::Publisher<Pose>::SharedPtr pose_pub_;
     std::uint64_t last_sample_ = 0;
 };
 

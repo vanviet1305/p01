@@ -21,6 +21,7 @@ find_package(px4_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 
 # rcl_interfaces cung cấp mô tả tham số ROS; Eigen xử lý vector/ma trận P01.
@@ -81,7 +82,10 @@ ament_target_dependencies(p01_path_visualizer
   rclcpp
   geometry_msgs
   nav_msgs
+  visualization_msgs
 )
+# Eigen dùng để đổi tư thế NED/FRD sang ENU/FLU khi vẽ mô hình UAV.
+target_link_libraries(p01_path_visualizer Eigen3::Eigen)
 
 install(TARGETS p01_path_visualizer
   DESTINATION lib/${PROJECT_NAME}
