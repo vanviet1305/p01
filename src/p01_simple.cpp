@@ -162,9 +162,12 @@ private:
             stage = 4;   // ghi CSV: đoạn hạ cánh
 
             // Chạm đất xong 2 s thì disarm, thêm 1 s thì tắt node.
+            // Phải dùng disarm CƯỠNG BỨC (param2 = 21196). Log PX4 21/11: disarm thường luôn bị từ chối
+            // "Disarming denied: not landed" vì ở chế độ gửi lệnh motor trực tiếp, bộ phát hiện hạ cánh
+            // của PX4 không bao giờ báo đã đáp → node tắt → mất Offboard → failsafe Return (bay lên rồi đáp).
             if (tau >= LAND_TIME + 2.0 && !sent_disarm_)
             {
-                send_command(Command::VEHICLE_CMD_COMPONENT_ARM_DISARM, 0, 0);   // 0 = disarm thường
+                send_command(Command::VEHICLE_CMD_COMPONENT_ARM_DISARM, 0, 21196);   // 21196 = cưỡng bức
                 sent_disarm_ = true;
             }
             if (tau >= LAND_TIME + 3.0)
@@ -207,7 +210,7 @@ private:
         }
     }
 
-    // Gửi một lệnh VehicleCommand. Offboard: (DO_SET_MODE, 1, 6). Arm: (ARM_DISARM, 1, 0). Disarm: (ARM_DISARM, 0, 0).
+    // Gửi một lệnh VehicleCommand. Offboard: (DO_SET_MODE, 1, 6). Arm: (ARM_DISARM, 1, 0). Disarm cưỡng bức: (ARM_DISARM, 0, 21196).
     void send_command(uint32_t command, float p1, float p2)
     {
         Command msg{};
