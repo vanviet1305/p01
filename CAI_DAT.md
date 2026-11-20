@@ -58,7 +58,7 @@ mkdir -p ~/ros2_px4_ws/src && cd ~/ros2_px4_ws/src
 ```
 
 ```bash
-git clone <URL_REPO_NAY> p01
+git clone https://github.com/vanviet1305/p01.git p01
 ```
 
 ```bash
