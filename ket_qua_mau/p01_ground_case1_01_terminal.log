@@ -1,0 +1,177 @@
+[INFO] [1795108077.697705501] [p01_offboard_hover]: X500 ACTUATION ENABLED, reference=case1; P01 takeoff +2.00 m / 6.00 s.
+[INFO] [1795108077.697811202] [p01_offboard_hover]: Topics: odom=/fmu/out/vehicle_odometry status=/fmu/out/vehicle_status_v5 command=/fmu/in/vehicle_command_v1
+[INFO] [1795108077.703297774] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.000 Psi=0.0000 f=20.23/20.23 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795108077.798109274] [p01_offboard_hover]: Waiting/dry-run: status=0 odom=1 valid=1 rate_ok=1 land_fresh=0 ground_ready=0 enabled=1
+[INFO] [1795108078.078643950] [p01_offboard_hover]: Ground feedback: landed=1 contact=1 freefall=0
+[INFO] [1795108078.163109651] [p01_offboard_hover]: Session stage=1: Prestreaming on ground
+[INFO] [1795108078.715047626] [p01_offboard_hover]: t=0.00 stage=1 blend=0.00 ex=0.005 Psi=0.0000 f=20.21/0.77 Mz=-0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108079.374545381] [p01_offboard_hover]: Session stage=2: Waiting for Offboard
+[INFO] [1795108079.374665308] [p01_offboard_hover]: Requested PX4 mode 6 / 0
+[INFO] [1795108079.386602741] [p01_offboard_hover]: Command ACK: command=176 result=0 (0=accepted)
+[INFO] [1795108079.418484768] [p01_offboard_hover]: Session stage=5: Waiting for armed status
+[INFO] [1795108079.418594539] [p01_offboard_hover]: Requested PX4 arm
+[INFO] [1795108079.422624431] [p01_offboard_hover]: Command ACK: command=400 result=0 (0=accepted)
+[INFO] [1795108079.619772056] [p01_offboard_hover]: Session stage=6: Starting rotors
+[INFO] [1795108079.716134633] [p01_offboard_hover]: t=0.00 stage=6 blend=0.01 ex=0.021 Psi=0.0001 f=20.28/0.90 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108080.400878009] [p01_offboard_hover]: Ground feedback: landed=0 contact=0 freefall=0
+[INFO] [1795108080.723324690] [p01_offboard_hover]: t=0.00 stage=6 blend=0.58 ex=0.010 Psi=0.0000 f=20.16/11.96 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108081.623278643] [p01_offboard_hover]: Session stage=7: P01 takeoff started
+[INFO] [1795108081.723387531] [p01_offboard_hover]: t=0.10 stage=7 blend=1.00 ex=0.051 Psi=0.0003 f=20.19/20.19 Mz=-0.001/-0.001 saturated=0 motor_stream=ON
+[INFO] [1795108082.724428989] [p01_offboard_hover]: t=1.10 stage=7 blend=1.00 ex=0.017 Psi=0.0000 f=20.89/20.89 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108083.734634047] [p01_offboard_hover]: t=2.11 stage=7 blend=1.00 ex=0.024 Psi=0.0000 f=21.19/21.19 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108084.735375137] [p01_offboard_hover]: t=3.11 stage=7 blend=1.00 ex=0.022 Psi=0.0000 f=20.03/20.03 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108085.736711637] [p01_offboard_hover]: t=4.11 stage=7 blend=1.00 ex=0.028 Psi=0.0000 f=19.24/19.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108086.742587570] [p01_offboard_hover]: t=5.12 stage=7 blend=1.00 ex=0.024 Psi=0.0000 f=19.88/19.88 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108087.742676239] [p01_offboard_hover]: t=6.12 stage=7 blend=1.00 ex=0.006 Psi=0.0000 f=20.18/20.18 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108088.622724773] [p01_offboard_hover]: Session stage=3: Takeoff complete; holding
+[INFO] [1795108088.742760227] [p01_offboard_hover]: t=7.12 stage=3 blend=1.00 ex=0.019 Psi=0.0000 f=20.18/20.18 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108089.743135900] [p01_offboard_hover]: t=8.12 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108090.754710471] [p01_offboard_hover]: t=9.14 stage=3 blend=1.00 ex=0.020 Psi=0.0000 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108091.762548332] [p01_offboard_hover]: t=10.14 stage=3 blend=1.00 ex=0.011 Psi=0.0000 f=20.24/20.24 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108092.763448387] [p01_offboard_hover]: t=11.14 stage=3 blend=1.00 ex=0.011 Psi=0.0000 f=20.23/20.23 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108093.775072874] [p01_offboard_hover]: t=12.15 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.63/20.63 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108094.782655487] [p01_offboard_hover]: t=13.16 stage=3 blend=1.00 ex=0.020 Psi=0.0000 f=20.76/20.76 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108095.782835280] [p01_offboard_hover]: t=14.16 stage=3 blend=1.00 ex=0.035 Psi=0.0000 f=20.12/20.12 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108096.783604173] [p01_offboard_hover]: t=15.16 stage=3 blend=1.00 ex=0.030 Psi=0.0000 f=19.69/19.69 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108097.796392941] [p01_offboard_hover]: t=16.18 stage=3 blend=1.00 ex=0.029 Psi=0.0000 f=19.51/19.51 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108098.803848743] [p01_offboard_hover]: t=17.19 stage=3 blend=1.00 ex=0.051 Psi=0.0000 f=19.80/19.80 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108099.815255994] [p01_offboard_hover]: t=18.19 stage=3 blend=1.00 ex=0.041 Psi=0.0000 f=20.32/20.32 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108100.815260054] [p01_offboard_hover]: t=19.19 stage=3 blend=1.00 ex=0.012 Psi=0.0000 f=20.80/20.80 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108101.815639695] [p01_offboard_hover]: t=20.19 stage=3 blend=1.00 ex=0.044 Psi=0.0000 f=20.93/20.93 Mz=-0.001/-0.001 saturated=0 motor_stream=ON
+[INFO] [1795108102.815776660] [p01_offboard_hover]: t=21.19 stage=3 blend=1.00 ex=0.055 Psi=0.0000 f=20.66/20.66 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108103.824257869] [p01_offboard_hover]: t=22.20 stage=3 blend=1.00 ex=0.055 Psi=0.0000 f=20.10/20.10 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108104.835156605] [p01_offboard_hover]: t=23.22 stage=3 blend=1.00 ex=0.017 Psi=0.0000 f=19.61/19.61 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108105.843570519] [p01_offboard_hover]: t=24.23 stage=3 blend=1.00 ex=0.027 Psi=0.0000 f=19.55/19.55 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108106.855781896] [p01_offboard_hover]: t=25.23 stage=3 blend=1.00 ex=0.045 Psi=0.0001 f=19.79/19.79 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108107.862568750] [p01_offboard_hover]: t=26.24 stage=3 blend=1.00 ex=0.046 Psi=0.0000 f=20.37/20.37 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108108.862627669] [p01_offboard_hover]: t=27.24 stage=3 blend=1.00 ex=0.031 Psi=0.0000 f=20.83/20.83 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108109.863080290] [p01_offboard_hover]: t=28.24 stage=3 blend=1.00 ex=0.029 Psi=0.0000 f=20.94/20.94 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108110.863465987] [p01_offboard_hover]: t=29.24 stage=3 blend=1.00 ex=0.047 Psi=0.0000 f=20.63/20.63 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108111.874891349] [p01_offboard_hover]: t=30.26 stage=3 blend=1.00 ex=0.037 Psi=0.0000 f=20.09/20.09 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108112.882938427] [p01_offboard_hover]: t=31.27 stage=3 blend=1.00 ex=0.010 Psi=0.0000 f=19.61/19.61 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108113.883722625] [p01_offboard_hover]: t=32.27 stage=3 blend=1.00 ex=0.026 Psi=0.0000 f=19.52/19.52 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108114.894758434] [p01_offboard_hover]: t=33.27 stage=3 blend=1.00 ex=0.057 Psi=0.0000 f=19.87/19.87 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108115.894948234] [p01_offboard_hover]: t=34.27 stage=3 blend=1.00 ex=0.048 Psi=0.0000 f=20.35/20.35 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108116.902782249] [p01_offboard_hover]: t=35.28 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.86/20.86 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108117.903466586] [p01_offboard_hover]: t=36.28 stage=3 blend=1.00 ex=0.040 Psi=0.0000 f=20.93/20.93 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108118.914686162] [p01_offboard_hover]: t=37.30 stage=3 blend=1.00 ex=0.067 Psi=0.0000 f=20.18/20.18 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108119.915128765] [p01_offboard_hover]: t=38.30 stage=3 blend=1.00 ex=0.050 Psi=0.0000 f=19.86/19.86 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108120.915943358] [p01_offboard_hover]: t=39.30 stage=3 blend=1.00 ex=0.034 Psi=0.0000 f=20.14/20.14 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108121.922617049] [p01_offboard_hover]: t=40.31 stage=3 blend=1.00 ex=0.021 Psi=0.0000 f=20.26/20.26 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108122.922857081] [p01_offboard_hover]: t=41.31 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.21/20.21 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108123.922913892] [p01_offboard_hover]: t=42.31 stage=3 blend=1.00 ex=0.034 Psi=0.0000 f=20.19/20.19 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108124.923295247] [p01_offboard_hover]: t=43.31 stage=3 blend=1.00 ex=0.025 Psi=0.0000 f=20.19/20.19 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108125.935242832] [p01_offboard_hover]: t=44.32 stage=3 blend=1.00 ex=0.009 Psi=0.0000 f=20.29/20.29 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108126.935307320] [p01_offboard_hover]: t=45.32 stage=3 blend=1.00 ex=0.006 Psi=0.0000 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108127.935449679] [p01_offboard_hover]: t=46.32 stage=3 blend=1.00 ex=0.023 Psi=0.0000 f=20.19/20.19 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108128.936684360] [p01_offboard_hover]: t=47.32 stage=3 blend=1.00 ex=0.039 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108129.942864530] [p01_offboard_hover]: t=48.32 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.27/20.27 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108130.943246328] [p01_offboard_hover]: t=49.32 stage=3 blend=1.00 ex=0.012 Psi=0.0000 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108131.944010012] [p01_offboard_hover]: t=50.32 stage=3 blend=1.00 ex=0.020 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108132.955337718] [p01_offboard_hover]: t=51.34 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108133.962785701] [p01_offboard_hover]: t=52.35 stage=3 blend=1.00 ex=0.011 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108134.974765660] [p01_offboard_hover]: t=53.36 stage=3 blend=1.00 ex=0.019 Psi=0.0000 f=20.16/20.16 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108135.976345348] [p01_offboard_hover]: t=54.36 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108136.982879126] [p01_offboard_hover]: t=55.36 stage=3 blend=1.00 ex=0.017 Psi=0.0000 f=20.21/20.21 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108137.994948845] [p01_offboard_hover]: t=56.37 stage=3 blend=1.00 ex=0.030 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108139.002955334] [p01_offboard_hover]: t=57.38 stage=3 blend=1.00 ex=0.008 Psi=0.0000 f=20.29/20.29 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108140.003138618] [p01_offboard_hover]: t=58.38 stage=3 blend=1.00 ex=0.014 Psi=0.0000 f=20.27/20.27 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108141.003179594] [p01_offboard_hover]: t=59.38 stage=3 blend=1.00 ex=0.012 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108142.014807277] [p01_offboard_hover]: t=60.40 stage=3 blend=1.00 ex=0.009 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108143.015456055] [p01_offboard_hover]: t=61.40 stage=3 blend=1.00 ex=0.017 Psi=0.0000 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108144.022689031] [p01_offboard_hover]: t=62.40 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108145.024076659] [p01_offboard_hover]: t=63.40 stage=3 blend=1.00 ex=0.010 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108146.024317260] [p01_offboard_hover]: t=64.40 stage=3 blend=1.00 ex=0.019 Psi=0.0000 f=20.21/20.21 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108147.034970007] [p01_offboard_hover]: t=65.42 stage=3 blend=1.00 ex=0.020 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108148.043181346] [p01_offboard_hover]: t=66.43 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.20/20.20 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108149.054782678] [p01_offboard_hover]: t=67.44 stage=3 blend=1.00 ex=0.007 Psi=0.0000 f=20.28/20.28 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108150.055020540] [p01_offboard_hover]: t=68.44 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108151.055992067] [p01_offboard_hover]: t=69.44 stage=3 blend=1.00 ex=0.007 Psi=0.0000 f=20.24/20.24 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108152.063918895] [p01_offboard_hover]: t=70.45 stage=3 blend=1.00 ex=0.030 Psi=0.0000 f=20.19/20.19 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108153.069437746] [p01_offboard_hover]: t=71.44 stage=3 blend=1.00 ex=0.036 Psi=0.0000 f=20.30/20.30 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108154.075973357] [p01_offboard_hover]: t=72.45 stage=3 blend=1.00 ex=0.017 Psi=0.0000 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108155.087925240] [p01_offboard_hover]: t=73.46 stage=3 blend=1.00 ex=0.010 Psi=0.0000 f=20.23/20.23 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108156.089670654] [p01_offboard_hover]: t=74.46 stage=3 blend=1.00 ex=0.009 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108157.095910170] [p01_offboard_hover]: t=75.47 stage=3 blend=1.00 ex=0.024 Psi=0.0000 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108158.096148913] [p01_offboard_hover]: t=76.47 stage=3 blend=1.00 ex=0.037 Psi=0.0000 f=20.16/20.16 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108159.097860983] [p01_offboard_hover]: t=77.47 stage=3 blend=1.00 ex=0.020 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108160.107996149] [p01_offboard_hover]: t=78.49 stage=3 blend=1.00 ex=0.009 Psi=0.0000 f=20.26/20.26 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108161.109488563] [p01_offboard_hover]: t=79.49 stage=3 blend=1.00 ex=0.019 Psi=0.0000 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108162.116527407] [p01_offboard_hover]: t=80.49 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108163.129005775] [p01_offboard_hover]: t=81.50 stage=3 blend=1.00 ex=0.006 Psi=0.0000 f=20.20/20.20 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108164.136196069] [p01_offboard_hover]: t=82.51 stage=3 blend=1.00 ex=0.006 Psi=0.0000 f=20.21/20.21 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108165.148341137] [p01_offboard_hover]: t=83.53 stage=3 blend=1.00 ex=0.035 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108166.156003957] [p01_offboard_hover]: t=84.53 stage=3 blend=1.00 ex=0.017 Psi=0.0000 f=20.21/20.21 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108167.156142606] [p01_offboard_hover]: t=85.53 stage=3 blend=1.00 ex=0.014 Psi=0.0000 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108168.158475380] [p01_offboard_hover]: t=86.53 stage=3 blend=1.00 ex=0.012 Psi=0.0000 f=20.20/20.20 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108169.169169315] [p01_offboard_hover]: t=87.54 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.23/20.23 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108170.169566698] [p01_offboard_hover]: t=88.54 stage=3 blend=1.00 ex=0.025 Psi=0.0000 f=20.23/20.23 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108171.175762879] [p01_offboard_hover]: t=89.55 stage=3 blend=1.00 ex=0.010 Psi=0.0000 f=20.20/20.20 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108172.176722042] [p01_offboard_hover]: t=90.55 stage=3 blend=1.00 ex=0.014 Psi=0.0000 f=20.27/20.27 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108173.188276094] [p01_offboard_hover]: t=91.56 stage=3 blend=1.00 ex=0.024 Psi=0.0000 f=20.21/20.21 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108174.195922508] [p01_offboard_hover]: t=92.57 stage=3 blend=1.00 ex=0.029 Psi=0.0000 f=20.24/20.24 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108175.197034145] [p01_offboard_hover]: t=93.57 stage=3 blend=1.00 ex=0.027 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108176.201674436] [p01_offboard_hover]: t=94.57 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.21/20.21 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108177.201945636] [p01_offboard_hover]: t=95.57 stage=3 blend=1.00 ex=0.012 Psi=0.0000 f=20.23/20.23 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108178.213556952] [p01_offboard_hover]: t=96.58 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.17/20.17 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108179.221135783] [p01_offboard_hover]: t=97.59 stage=3 blend=1.00 ex=0.024 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108180.221610776] [p01_offboard_hover]: t=98.59 stage=3 blend=1.00 ex=0.025 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108181.233643237] [p01_offboard_hover]: t=99.60 stage=3 blend=1.00 ex=0.008 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108182.233882710] [p01_offboard_hover]: t=100.60 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108183.241000925] [p01_offboard_hover]: t=101.61 stage=3 blend=1.00 ex=0.011 Psi=0.0000 f=20.22/20.22 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108184.241231175] [p01_offboard_hover]: t=102.61 stage=3 blend=1.00 ex=0.007 Psi=0.0000 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108185.253166125] [p01_offboard_hover]: t=103.62 stage=3 blend=1.00 ex=0.008 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108186.254960920] [p01_offboard_hover]: t=104.62 stage=3 blend=1.00 ex=0.026 Psi=0.0000 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108187.261420511] [p01_offboard_hover]: t=105.63 stage=3 blend=1.00 ex=0.034 Psi=0.0000 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108188.273726653] [p01_offboard_hover]: t=106.64 stage=3 blend=1.00 ex=0.034 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108189.281358223] [p01_offboard_hover]: t=107.65 stage=3 blend=1.00 ex=0.012 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108190.293297981] [p01_offboard_hover]: t=108.67 stage=3 blend=1.00 ex=0.034 Psi=0.0000 f=20.19/20.19 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108191.294387274] [p01_offboard_hover]: t=109.67 stage=3 blend=1.00 ex=0.013 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108192.301326698] [p01_offboard_hover]: t=110.67 stage=3 blend=1.00 ex=0.016 Psi=0.0000 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108193.301535443] [p01_offboard_hover]: t=111.67 stage=3 blend=1.00 ex=0.006 Psi=0.0000 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108194.313285564] [p01_offboard_hover]: t=112.68 stage=3 blend=1.00 ex=0.021 Psi=0.0000 f=20.26/20.26 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108195.313392105] [p01_offboard_hover]: t=113.68 stage=3 blend=1.00 ex=0.021 Psi=0.0000 f=20.22/20.22 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108196.313489245] [p01_offboard_hover]: t=114.68 stage=3 blend=1.00 ex=0.035 Psi=0.0000 f=20.23/20.23 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108197.321231028] [p01_offboard_hover]: t=115.69 stage=3 blend=1.00 ex=0.020 Psi=0.0000 f=20.18/20.18 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108198.322302966] [p01_offboard_hover]: t=116.69 stage=3 blend=1.00 ex=0.018 Psi=0.0000 f=20.27/20.27 Mz=-0.000/-0.000 saturated=0 motor_stream=ON
+[INFO] [1795108199.334715141] [p01_offboard_hover]: t=117.70 stage=3 blend=1.00 ex=0.011 Psi=0.0000 f=20.22/20.22 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108200.341430726] [p01_offboard_hover]: t=118.71 stage=3 blend=1.00 ex=0.023 Psi=0.0000 f=20.21/20.21 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108201.353703827] [p01_offboard_hover]: t=119.72 stage=3 blend=1.00 ex=0.023 Psi=0.0000 f=20.25/20.25 Mz=0.000/0.000 saturated=0 motor_stream=ON
+[INFO] [1795108202.025983098] [p01_offboard_hover]: Command ACK: command=176 result=0 (0=accepted)
+[INFO] [1795108202.117075240] [p01_offboard_hover]: Session stage=4: PX4 exited Offboard
+[INFO] [1795108202.354381252] [p01_offboard_hover]: t=120.72 stage=4 blend=0.00 ex=0.107 Psi=0.0000 f=24.98/24.98 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795108203.361788249] [p01_offboard_hover]: t=121.73 stage=4 blend=0.00 ex=0.963 Psi=0.0000 f=32.36/32.36 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795108204.373508263] [p01_offboard_hover]: t=122.75 stage=4 blend=0.00 ex=1.569 Psi=0.0000 f=37.21/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108205.381132329] [p01_offboard_hover]: t=123.76 stage=4 blend=0.00 ex=2.188 Psi=0.0000 f=42.52/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108206.382320481] [p01_offboard_hover]: t=124.76 stage=4 blend=0.00 ex=2.662 Psi=0.0000 f=42.25/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108206.659074641] [p01_offboard_hover]: Ground feedback: landed=0 contact=1 freefall=0
+[INFO] [1795108207.355152072] [p01_offboard_hover]: Ground feedback: landed=1 contact=1 freefall=0
+[INFO] [1795108207.384137970] [p01_offboard_hover]: t=125.76 stage=4 blend=0.00 ex=2.648 Psi=0.0000 f=42.09/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108208.393630131] [p01_offboard_hover]: t=126.77 stage=4 blend=0.00 ex=2.638 Psi=0.0001 f=42.00/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108209.402198006] [p01_offboard_hover]: t=127.78 stage=4 blend=0.00 ex=2.624 Psi=0.0001 f=41.87/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108210.413627672] [p01_offboard_hover]: t=128.79 stage=4 blend=0.00 ex=2.624 Psi=0.0000 f=41.90/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108211.414328868] [p01_offboard_hover]: t=129.79 stage=4 blend=0.00 ex=2.625 Psi=0.0000 f=41.92/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108212.414584257] [p01_offboard_hover]: t=130.79 stage=4 blend=0.00 ex=2.624 Psi=0.0000 f=41.91/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108213.422226468] [p01_offboard_hover]: t=131.80 stage=4 blend=0.00 ex=2.623 Psi=0.0000 f=41.88/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108214.427832381] [p01_offboard_hover]: t=132.79 stage=4 blend=0.00 ex=2.643 Psi=0.0000 f=42.10/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108215.427973587] [p01_offboard_hover]: t=133.79 stage=4 blend=0.00 ex=2.650 Psi=0.0000 f=42.17/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108216.435055649] [p01_offboard_hover]: t=134.80 stage=4 blend=0.00 ex=2.648 Psi=0.0000 f=42.16/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108217.435767824] [p01_offboard_hover]: t=135.80 stage=4 blend=0.00 ex=2.639 Psi=0.0000 f=42.05/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108218.447346401] [p01_offboard_hover]: t=136.81 stage=4 blend=0.00 ex=2.618 Psi=0.0000 f=41.83/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108219.455779878] [p01_offboard_hover]: t=137.82 stage=4 blend=0.00 ex=2.611 Psi=0.0000 f=41.77/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108220.467267434] [p01_offboard_hover]: t=138.83 stage=4 blend=0.00 ex=2.612 Psi=0.0000 f=41.79/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108221.467700392] [p01_offboard_hover]: t=139.83 stage=4 blend=0.00 ex=2.620 Psi=0.0000 f=41.88/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108222.475865171] [p01_offboard_hover]: t=140.84 stage=4 blend=0.00 ex=2.612 Psi=0.0000 f=41.80/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108223.476026333] [p01_offboard_hover]: t=141.84 stage=4 blend=0.00 ex=2.615 Psi=0.0000 f=41.84/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108224.487464359] [p01_offboard_hover]: t=142.85 stage=4 blend=0.00 ex=2.611 Psi=0.0000 f=41.80/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108225.487608657] [p01_offboard_hover]: t=143.85 stage=4 blend=0.00 ex=2.612 Psi=0.0000 f=41.81/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108226.495922357] [p01_offboard_hover]: t=144.86 stage=4 blend=0.00 ex=2.611 Psi=0.0001 f=41.80/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108227.507405199] [p01_offboard_hover]: t=145.87 stage=4 blend=0.00 ex=2.606 Psi=0.0000 f=41.75/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108228.507669114] [p01_offboard_hover]: t=146.87 stage=4 blend=0.00 ex=2.614 Psi=0.0000 f=41.84/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108229.507766840] [p01_offboard_hover]: t=147.87 stage=4 blend=0.00 ex=2.607 Psi=0.0000 f=41.77/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108230.515656388] [p01_offboard_hover]: t=148.88 stage=4 blend=0.00 ex=2.607 Psi=0.0000 f=41.78/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108231.527186045] [p01_offboard_hover]: t=149.89 stage=4 blend=0.00 ex=2.607 Psi=0.0000 f=41.78/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108232.527236953] [p01_offboard_hover]: t=150.89 stage=4 blend=0.00 ex=2.604 Psi=0.0000 f=41.74/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108233.532624436] [p01_offboard_hover]: t=151.88 stage=4 blend=0.00 ex=2.590 Psi=0.0000 f=41.61/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108234.544995476] [p01_offboard_hover]: t=152.89 stage=4 blend=0.00 ex=2.587 Psi=0.0000 f=41.59/34.19 Mz=0.000/0.000 saturated=1 motor_stream=OFF
+[INFO] [1795108235.553094077] [p01_offboard_hover]: t=153.90 stage=4 blend=0.00 ex=2.595 Psi=0.0000 f=41.68/34.19 Mz=-0.000/0.000 saturated=1 motor_stream=OFF

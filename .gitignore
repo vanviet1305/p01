@@ -1,0 +1,15 @@
+# Đầu ra build của colcon (người nhận tự build)
+build/
+install/
+log/
+# Cấu hình cá nhân / bí mật — không bao giờ đẩy lên
+.vscode/
+.aws/
+.codex/
+.agents/
+.env
+# Python
+__pycache__/
+*.pyc
+# Log chạy mới của người dùng (log mẫu nằm trong ket_qua_mau/ được giữ)
+/p01_logs/

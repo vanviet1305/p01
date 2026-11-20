@@ -1,0 +1,82 @@
+{
+  "source": "/home/vanviet1305/báo/p01/ket_qua_mau/p01_ground_case1_01.csv",
+  "source_sha256": "5997857d1efc988e67a510e88a2f6070c7aa57aa27dcba9c55c83608053d5a4e",
+  "source_bytes": 4405416,
+  "all_rows": 15875,
+  "stage_counts": {
+    "0": 47,
+    "1": 120,
+    "2": 5,
+    "3": 11348,
+    "4": 3435,
+    "5": 20,
+    "6": 200,
+    "7": 700
+  },
+  "last_recorded_stage": 4,
+  "max_error_recomputation_difference_m": 1.1029438057308383e-09,
+  "created_at_utc": "2026-11-20T17:26:19.610946+00:00",
+  "runtime": {
+    "python": "3.10.12",
+    "numpy": "1.21.5",
+    "matplotlib": "3.5.1"
+  },
+  "selection": "stage == 3; one contiguous Active segment",
+  "coordinates": {
+    "data": "PX4 local NED, meters",
+    "display_height": "h = -z_NED",
+    "errors": "feedback - reference, NED"
+  },
+  "phase_boundaries_from_run_configuration_s": {
+    "movement_start": 10.0,
+    "movement_end": 40.0
+  },
+  "active": {
+    "samples": 11348,
+    "time_first_s": 7.000556,
+    "time_last_s": 120.482346,
+    "mean_m": 0.022307721207143996,
+    "rms_m": 0.02587329438513847,
+    "max_m": 0.06817472689328907,
+    "time_at_max_s": 37.586816
+  },
+  "segments": {
+    "initial_hold": {
+      "samples": 300,
+      "time_first_s": 7.000556,
+      "time_last_s": 9.99279,
+      "mean_m": 0.016744539266193875,
+      "rms_m": 0.01701386124925165,
+      "max_m": 0.021434967752826734,
+      "time_at_max_s": 7.376556
+    },
+    "movement": {
+      "samples": 3000,
+      "time_first_s": 10.00079,
+      "time_last_s": 39.994958,
+      "mean_m": 0.03438870516009844,
+      "rms_m": 0.03796579412253261,
+      "max_m": 0.06817472689328907,
+      "time_at_max_s": 37.586816
+    },
+    "final_hold": {
+      "samples": 8048,
+      "time_first_s": 40.002958,
+      "time_last_s": 120.482346,
+      "mean_m": 0.018011747390471743,
+      "rms_m": 0.019895401476824254,
+      "max_m": 0.04002938761279572,
+      "time_at_max_s": 47.507526
+    }
+  },
+  "requested_force_range_N": [
+    19.50458765,
+    21.19580585
+  ],
+  "allocator_saturation_samples": 0,
+  "final_hold_reference_span_m": [
+    0.0,
+    0.0,
+    0.0
+  ]
+}

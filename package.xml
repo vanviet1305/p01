@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <!-- Metadata dùng để ROS/colcon nhận diện package. Các TODO mô tả/giấy phép
+       vẫn là chỗ trống kế thừa từ lệnh tạo package, chưa phải tuyên bố giấy phép. -->
+  <name>p01</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="vanviet1305@todo.todo">vanviet1305</maintainer>
+  <license>TODO: License declaration</license>
+
+  <!-- Công cụ build; mã điều khiển chạy trong executable C++, không chạy ở XML. -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- rclcpp: node, callback, publisher/subscriber; px4_msgs: cấu trúc bản tin PX4. -->
+  <depend>rclcpp</depend>
+  <depend>px4_msgs</depend>
+
+  <depend>geometry_msgs</depend>
+<depend>nav_msgs</depend>
+<depend>std_msgs</depend>
+
+<exec_depend>rviz2</exec_depend>
+<exec_depend>rqt_plot</exec_depend>
+
+  <!-- Mô tả tham số ROS và thư viện đại số tuyến tính Eigen cho P01/X500. -->
+  <depend>rcl_interfaces</depend>
+<build_depend>eigen3_cmake_module</build_depend>
+<depend>eigen</depend>
+
+
+
+  <!-- Phụ thuộc lint (kiểm tra mã), không phải bộ mô phỏng hay kiểm chứng bay. -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

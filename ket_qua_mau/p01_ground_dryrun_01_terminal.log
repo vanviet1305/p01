@@ -1,0 +1,98 @@
+[INFO] [1795107227.263896659] [p01_offboard_hover]: X500 DRY-RUN, reference=hover; P01 takeoff +2.00 m / 6.00 s.
+[INFO] [1795107227.264006688] [p01_offboard_hover]: Topics: odom=/fmu/out/vehicle_odometry status=/fmu/out/vehicle_status_v5 command=/fmu/in/vehicle_command_v1
+[INFO] [1795107227.273560163] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.000 Psi=0.0000 f=20.29/20.29 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107227.363993598] [p01_offboard_hover]: Waiting/dry-run: status=0 odom=1 valid=1 rate_ok=1 land_fresh=0 ground_ready=0 enabled=0
+[INFO] [1795107227.717006046] [p01_offboard_hover]: Ground feedback: landed=1 contact=1 freefall=0
+[INFO] [1795107228.280846982] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.023 Psi=0.0000 f=20.48/20.48 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107229.292737275] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.029 Psi=0.0000 f=20.51/20.51 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107229.463960609] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107230.293469417] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.027 Psi=0.0001 f=20.33/20.33 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107231.300659088] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.019 Psi=0.0001 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107231.563864085] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107232.300793807] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.022 Psi=0.0000 f=20.03/20.03 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107233.313121627] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.028 Psi=0.0001 f=20.06/20.06 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107233.663796228] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107234.320871773] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.044 Psi=0.0002 f=20.02/20.02 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107235.332820391] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.034 Psi=0.0001 f=20.11/20.11 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107235.763758747] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107236.332909296] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.027 Psi=0.0001 f=20.17/20.17 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107237.332928265] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.027 Psi=0.0001 f=20.18/20.18 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107237.863753644] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107238.340857034] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.018 Psi=0.0000 f=20.28/20.28 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107239.341028956] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.030 Psi=0.0001 f=20.26/20.26 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107239.963593015] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107240.353022479] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.018 Psi=0.0000 f=20.38/20.38 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107241.353424050] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.024 Psi=0.0000 f=20.43/20.43 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107242.063532166] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107242.361004437] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.021 Psi=0.0000 f=20.39/20.39 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107243.372895372] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.020 Psi=0.0000 f=20.40/20.40 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107244.163466504] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107244.373261921] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.024 Psi=0.0001 f=20.31/20.31 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107245.377121586] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.021 Psi=0.0001 f=20.20/20.20 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107246.263438149] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107246.377358429] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.025 Psi=0.0001 f=20.14/20.14 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107247.378036044] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.028 Psi=0.0001 f=20.13/20.13 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107248.363347734] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107248.385465928] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.037 Psi=0.0002 f=20.14/20.14 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107249.399933986] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.035 Psi=0.0001 f=20.26/20.26 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107250.405443644] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.037 Psi=0.0002 f=20.25/20.25 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107250.463368586] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107251.417195610] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.046 Psi=0.0003 f=20.31/20.31 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107252.424889585] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.029 Psi=0.0001 f=20.29/20.29 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107252.563235521] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107253.424975717] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.035 Psi=0.0001 f=20.34/20.34 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107254.425279922] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.044 Psi=0.0002 f=20.43/20.43 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107254.663135455] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107255.436980519] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.043 Psi=0.0002 f=20.39/20.39 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107256.444928543] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.034 Psi=0.0001 f=20.24/20.24 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107256.763107007] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107257.445092890] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.028 Psi=0.0001 f=20.19/20.19 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107258.445127352] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.028 Psi=0.0001 f=20.13/20.13 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107258.863032356] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107259.445218677] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.033 Psi=0.0002 f=20.15/20.15 Mz=0.000/0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107260.457201298] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.032 Psi=0.0002 f=20.15/20.15 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107260.962922001] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107261.465069761] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.040 Psi=0.0002 f=20.08/20.08 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107262.465273065] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.053 Psi=0.0002 f=19.91/19.91 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107263.062883237] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107263.477109282] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.062 Psi=0.0003 f=19.93/19.93 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107264.484976187] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.058 Psi=0.0004 f=20.20/20.20 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107265.062920328] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107265.485074294] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.040 Psi=0.0001 f=20.31/20.31 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107266.497057644] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.041 Psi=0.0001 f=20.13/20.13 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107267.162739976] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107267.497306929] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.022 Psi=0.0000 f=20.17/20.17 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107268.504989310] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.027 Psi=0.0001 f=20.15/20.15 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107269.262675202] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107269.505139632] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.048 Psi=0.0003 f=20.08/20.08 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107270.517150043] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.033 Psi=0.0001 f=20.13/20.13 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107271.362596588] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107271.525043832] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.015 Psi=0.0001 f=20.31/20.31 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107272.525526836] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.018 Psi=0.0001 f=20.36/20.36 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107273.462540180] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107273.537266995] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.033 Psi=0.0002 f=20.33/20.33 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107274.537458189] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.021 Psi=0.0000 f=20.26/20.26 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107275.537485260] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.013 Psi=0.0000 f=20.17/20.17 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107275.562426068] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107276.545326377] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.024 Psi=0.0000 f=20.06/20.06 Mz=-0.000/-0.000 saturated=0 motor_stream=OFF
+[INFO] [1795107277.545661752] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.034 Psi=0.0000 f=19.96/19.96 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107277.662454111] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107278.557001433] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.036 Psi=0.0001 f=20.02/20.02 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107279.559330624] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.031 Psi=0.0001 f=20.20/20.20 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107279.762444484] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107280.565085893] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.030 Psi=0.0001 f=20.18/20.18 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107281.565380244] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.026 Psi=0.0001 f=20.17/20.17 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107281.862272642] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107282.577090830] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.023 Psi=0.0001 f=20.19/20.19 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107283.577099907] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.033 Psi=0.0001 f=20.09/20.09 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107283.962199302] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107284.577314941] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.034 Psi=0.0001 f=20.15/20.15 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107285.585085668] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.025 Psi=0.0001 f=20.15/20.15 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107286.062102173] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107286.585128176] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.020 Psi=0.0001 f=20.19/20.19 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107287.597144416] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.026 Psi=0.0001 f=20.14/20.14 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107288.162053621] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107288.597571347] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.034 Psi=0.0001 f=20.02/20.02 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107289.604933221] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.024 Psi=0.0001 f=20.18/20.18 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF
+[INFO] [1795107290.261959597] [p01_offboard_hover]: Waiting/dry-run: status=1 odom=1 valid=1 rate_ok=1 land_fresh=1 ground_ready=1 enabled=0
+[INFO] [1795107290.617166988] [p01_offboard_hover]: t=0.00 stage=0 blend=0.00 ex=0.023 Psi=0.0000 f=20.17/20.17 Mz=-0.001/-0.001 saturated=0 motor_stream=OFF

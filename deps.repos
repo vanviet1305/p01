@@ -1,0 +1,15 @@
+# Phiên bản phụ thuộc ĐÃ KHÓA — đúng bộ đã bay thành công ngày 20/11/2026.
+# Dùng: cd ~/ros2_px4_ws/src && vcs import < p01/deps.repos
+# px4_msgs PHẢI khớp commit PX4-Autopilot bên dưới (đã đối chiếu 7 bản tin p01 dùng).
+repositories:
+  px4_msgs:
+    type: git
+    url: https://github.com/PX4/px4_msgs.git
+    version: 2e892300d8c20d3c29e198e324a10854b40ab8d3
+  Micro-XRCE-DDS-Agent:
+    type: git
+    url: https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+    version: 57d086216d01ec43121845d385894a25987f8a2c   # v2.4.2
+# PX4-Autopilot KHÔNG nằm trong workspace ROS; clone riêng vào ~/PX4-Autopilot:
+#   url:     https://github.com/PX4/PX4-Autopilot.git
+#   version: cf0797e4440e23d3e5393f197c156477cb4b5fdc   # v1.18.0-beta1-1260, không sửa gì
