@@ -20,7 +20,9 @@
 #include <px4_msgs/msg/offboard_control_mode.hpp>
 #include <px4_msgs/msg/vehicle_command.hpp>
 #include <px4_msgs/msg/vehicle_odometry.hpp>
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <limits>
 #include <memory>
@@ -31,6 +33,7 @@
 #include "uav_research/x500_control.hpp"
 #include "uav_research/p01_telemetry.hpp"
 #include "uav_research/p01_return_reference.hpp"
+#include "uav_research/gz_ground_truth.hpp"
 #include "uav_research/p02_controller.hpp"
 
 using namespace uav_research;
@@ -69,6 +72,12 @@ public:
         // return_home: sau Case I bay về trên điểm cất cánh rồi mới hạ, để lần bay sau vẫn xuất phát từ gốc.
         // Lý do: log 21/11 cho thấy sai số tăng theo khoảng cách tới gốc tọa độ PX4.
         return_home_ = declare_parameter<bool>("return_home", true);
+        // state_source: "px4" = trạng thái EKF2 (mặc định, như cũ); "gazebo" = vị trí/tư thế/vận tốc THẬT từ Gazebo
+        // (/model/x500_0/odometry, cần chạy tools/gan_odom_gazebo.sh trước). Vận tốc góc luôn lấy từ PX4 (con quay).
+        // Lý do: EKF2 ước lượng sai roll 1–4° khi bay gắt (log 21/11), làm lẫn lỗi ước lượng vào so sánh bộ điều khiển.
+        use_gt_ = declare_parameter<std::string>("state_source", "px4") == "gazebo";
+        if (use_gt_ && !gt_.start("/model/x500_0/odometry"))
+            RCLCPP_ERROR(get_logger(), "Không đăng ký được topic Gazebo /model/x500_0/odometry");
         case1_duration_ = CASE1_RAMP + CASE1_PHASE / case1_speed_;   // 30 s ở 0,25×; 17 s ở 0,5×; 10,5 s ở 1×
         const auto csv = declare_parameter<std::string>("log_csv", "");     // rỗng = không ghi CSV
 
@@ -111,7 +120,7 @@ public:
             log_.open(csv);
             log_ << "t,x,y,z,xd,yd,zd,position_error,Psi,f_requested,f_achieved,"
                     "Mx,My,Mz,Mx_achieved,My_achieved,Mz_achieved,u0,u1,u2,u3,saturated,stage,control_blend,"
-                    "ei_x,ei_y,ei_z,eI_x,eI_y,eI_z\n";
+                    "ei_x,ei_y,ei_z,eI_x,eI_y,eI_z,state_source_gazebo,ekf_x,ekf_y,ekf_z,ekf_tilt_err_deg\n";
         }
 
         // 1 timer 100 Hz: TOÀN BỘ việc điều khiển nằm trong loop().
@@ -131,6 +140,8 @@ private:
         state_.omega = Vector3(msg.angular_velocity[0], msg.angular_velocity[1], msg.angular_velocity[2]);
         // PX4 xếp quaternion w,x,y,z — trùng thứ tự Eigen.
         state_.R = Eigen::Quaterniond(msg.q[0], msg.q[1], msg.q[2], msg.q[3]).normalized().toRotationMatrix();
+        px4_x_ = state_.x;
+        px4_R_ = state_.R;
         sample_ = msg.timestamp_sample;
         have_odom_ = true;
     }
@@ -150,6 +161,27 @@ private:
         mode_pub_->publish(mode);
 
         if (!have_odom_) return;   // chưa có dữ liệu thì chưa tính được
+
+        // 1b. Trạng thái thật từ Gazebo (state_source:=gazebo): thay x, v, R; giữ omega từ con quay PX4.
+        //     Chưa có dữ liệu thì giữ đồng hồ node ở 0 (chưa cất cánh) và chờ.
+        if (use_gt_)
+        {
+            Vector3 xg, vg;
+            Matrix3 Rg;
+            double age = 0.0;
+            if (!gt_.get(xg, vg, Rg, age))
+            {
+                start_ = tick;
+                RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000,
+                    "Chưa có trạng thái thật từ Gazebo. Chạy: ~/ros2_px4_ws/src/p01/tools/gan_odom_gazebo.sh");
+                return;
+            }
+            if (age > 0.2)
+                RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1000, "Trạng thái thật từ Gazebo trễ %.2f s", age);
+            state_.x = xg;
+            state_.v = vg;
+            state_.R = Rg;
+        }
 
         // 2. Trước khi cất cánh: chốt gốc tại vị trí và hướng mũi hiện tại.
         if (now < T_CLIMB)
@@ -278,7 +310,10 @@ private:
             log_ << ',' << a.saturated << ',' << stage << ",1";
             for (int i = 0; i < 3; ++i) log_ << ',' << c.ei[i];
             for (int i = 0; i < 3; ++i) log_ << ',' << c.eI[i];
-            log_ << '\n';
+            // EKF2 so với trạng thái đang dùng: lệch vị trí và góc lệch trục z thân (nghiêng).
+            log_ << ',' << use_gt_;
+            for (int i = 0; i < 3; ++i) log_ << ',' << px4_x_[i];
+            log_ << ',' << std::acos(std::clamp(px4_R_.col(2).dot(state_.R.col(2)), -1.0, 1.0)) * 180.0 / M_PI << '\n';
         }
     }
 
@@ -304,6 +339,10 @@ private:
     double hover_time_ = 20.0;
     double case1_speed_ = 0.25, case1_duration_ = 30.0;
     bool return_home_ = true, returning_ = false;
+    bool use_gt_ = false;
+    GzGroundTruth gt_;
+    Vector3 px4_x_ = Vector3::Zero();          // vị trí EKF2 (ghi CSV để so với trạng thái thật)
+    Matrix3 px4_R_ = Matrix3::Identity();      // tư thế EKF2
     Vector3 return_from_ = Vector3::Zero();
     P01Parameters params_;
     P02Gains gains_;

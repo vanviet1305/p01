@@ -29,6 +29,9 @@ find_package(visualization_msgs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
+# gz-transport/gz-msgs (Gazebo Harmonic): p01_simple/p02_simple đọc trạng thái thật khi state_source:=gazebo.
+find_package(gz-transport13 REQUIRED)
+find_package(gz-msgs10 REQUIRED)
 
 
 
@@ -94,14 +97,14 @@ install(TARGETS p01_path_visualizer
 add_executable(p01_simple src/p01_simple.cpp)
 target_include_directories(p01_simple PRIVATE include)
 ament_target_dependencies(p01_simple rclcpp px4_msgs geometry_msgs std_msgs)
-target_link_libraries(p01_simple Eigen3::Eigen)
+target_link_libraries(p01_simple Eigen3::Eigen gz-transport13::gz-transport13 gz-msgs10::gz-msgs10)
 install(TARGETS p01_simple DESTINATION lib/${PROJECT_NAME})
 
 # Node P02 đơn giản (PID hình học, arXiv:1304.6765v1): chép p01_simple, đổi lõi sang P02Controller. Chỉ dùng trong Gazebo.
 add_executable(p02_simple src/p02_simple.cpp)
 target_include_directories(p02_simple PRIVATE include)
 ament_target_dependencies(p02_simple rclcpp px4_msgs geometry_msgs std_msgs)
-target_link_libraries(p02_simple Eigen3::Eigen)
+target_link_libraries(p02_simple Eigen3::Eigen gz-transport13::gz-transport13 gz-msgs10::gz-msgs10)
 install(TARGETS p02_simple DESTINATION lib/${PROJECT_NAME})
 
 # Đăng ký thông tin package với ament; giữ ở cuối cấu hình.
