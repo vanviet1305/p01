@@ -69,6 +69,11 @@ public:
         params_.m = declare_parameter<double>("mass_kg", params_.m);
         params_.kx = 4.0 * params_.m;
         params_.kv = 3.2 * params_.m;
+        // motor_k_scale: hệ số lực motor mà BỘ ĐIỀU KHIỂN tin = k thật (Gazebo) × scale.
+        // 1,1 = tin motor khỏe hơn 10% → lệnh u thấp hơn cần thiết → mỗi rotor chỉ ra ~91% lực yêu cầu.
+        // Mô phỏng sai đường cong lực/bàn đo lực trên máy bay thật: sai cả lực tổng lẫn mômen.
+        const double motor_k_scale = declare_parameter<double>("motor_k_scale", 1.0);
+        motors_.motor_constant *= motor_k_scale;
 
         // 3 publisher gửi vào PX4 (/fmu/in) + telemetry cho rqt_plot/RViz.
         motor_pub_ = create_publisher<Motors>(px4_topic<Motors>("/fmu/in/actuator_motors"), rclcpp::SensorDataQoS());
@@ -90,7 +95,8 @@ public:
         // 1 timer 100 Hz: TOÀN BỘ việc điều khiển nằm trong loop().
         start_ = std::chrono::steady_clock::now();
         timer_ = create_wall_timer(std::chrono::milliseconds(10), [this]() { loop(); });
-        RCLCPP_INFO(get_logger(), "p01_simple: reference_mode=%s mass_kg=%.3f (CHỈ DÙNG TRONG MÔ PHỎNG)", mode_.c_str(), params_.m);
+        RCLCPP_INFO(get_logger(), "p01_simple: reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f (CHỈ DÙNG TRONG MÔ PHỎNG)",
+            mode_.c_str(), params_.m, case1_speed_, motor_k_scale);
     }
 
 private:

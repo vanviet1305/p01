@@ -72,6 +72,11 @@ public:
         params_.m = declare_parameter<double>("mass_kg", params_.m);
         params_.kx = 4.0 * params_.m;
         params_.kv = 3.2 * params_.m;
+        // motor_k_scale: hệ số lực motor mà BỘ ĐIỀU KHIỂN tin = k thật (Gazebo) × scale.
+        // 1,1 = tin motor khỏe hơn 10% → lệnh u thấp hơn cần thiết → mỗi rotor chỉ ra ~91% lực yêu cầu.
+        // Mô phỏng sai đường cong lực/bàn đo lực trên máy bay thật: sai cả lực tổng lẫn mômen.
+        const double motor_k_scale = declare_parameter<double>("motor_k_scale", 1.0);
+        motors_.motor_constant *= motor_k_scale;
 
         // Hệ số P02 (mặc định xem P02Gains). ki mặc định = 1.0 * mass_kg khai báo.
         gains_.ki = declare_parameter<double>("ki", 1.0 * params_.m);
@@ -106,8 +111,8 @@ public:
         start_ = std::chrono::steady_clock::now();
         last_loop_ = start_;
         timer_ = create_wall_timer(std::chrono::milliseconds(10), [this]() { loop(); });
-        RCLCPP_INFO(get_logger(), "p02_simple: reference_mode=%s mass_kg=%.3f ki=%.2f c1=%.2f sigma=%.2f kI=(%.3f,%.3f) c2=%.2f integral=%d (CHỈ DÙNG TRONG MÔ PHỎNG)",
-            mode_.c_str(), params_.m, gains_.ki, gains_.c1, gains_.sigma, kI_xy, kI_z, gains_.c2, use_integral_);
+        RCLCPP_INFO(get_logger(), "p02_simple: reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f ki=%.2f c1=%.2f sigma=%.2f kI=(%.3f,%.3f) c2=%.2f integral=%d (CHỈ DÙNG TRONG MÔ PHỎNG)",
+            mode_.c_str(), params_.m, case1_speed_, motor_k_scale, gains_.ki, gains_.c1, gains_.sigma, kI_xy, kI_z, gains_.c2, use_integral_);
     }
 
 private:
