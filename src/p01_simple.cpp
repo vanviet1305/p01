@@ -7,7 +7,8 @@
 //
 //   t (s, tính từ lúc bắt đầu lên):
 //   hover: 0–6 lên 2 m │ giữ hover_time_s (mặc định 20) │ 6 s hạ cánh │ +2 s disarm │ +1 s node tự tắt
-//   case1: 0–6 lên 2 m │ 7–10 chờ │ 10–(10+T) bay Case I │ giữ 5 s │ 6 s hạ cánh │ disarm │ tự tắt
+//   case1: 0–6 lên 2 m │ 7–10 chờ │ 10–(10+T) bay Case I │ giữ 5 s │ 8 s bay về trên điểm cất cánh │ giữ 2 s
+//          │ 6 s hạ cánh │ disarm │ tự tắt   (return_home:=false bỏ đoạn bay về, hạ tại điểm cuối như cũ)
 //          T = 4 + 6,5/case1_speed: 30 s ở 0,25× (mặc định), 17 s ở 0,5×, 10,5 s ở 1×
 //   Trước t=0 (2 s đầu của node): heartbeat, lệnh Offboard ở 1 s, lệnh arm ở 1,5 s.
 //
@@ -27,6 +28,7 @@
 #include "uav_research/x500_reference.hpp"
 #include "uav_research/x500_control.hpp"
 #include "uav_research/p01_telemetry.hpp"
+#include "uav_research/p01_return_reference.hpp"
 
 using namespace uav_research;
 using Odom = px4_msgs::msg::VehicleOdometry;
@@ -44,7 +46,9 @@ const double HOLD_AFTER_CLIMB = 1.0; // giữ 1 s rồi mới tính là "Active"
 const double SETTLE = 3.0;       // case1: chờ thêm 3 s trước khi bay
 const double CASE1_RAMP = 4.0;   // case1: thời gian tăng/giảm tốc êm của pha (s)
 const double CASE1_PHASE = 6.5;  // case1: tổng pha Case I = 0,25 × (30 − 4); giữ nguyên hình quỹ đạo khi đổi tốc độ
-const double HOLD_END = 5.0;     // case1: giữ điểm cuối 5 s rồi hạ
+const double HOLD_END = 5.0;     // case1: giữ điểm cuối 5 s
+const double RETURN_TIME = 8.0;  // case1: bay về ngay trên điểm cất cánh trong 8 s (~2,7 m, v max ~0,74 m/s)
+const double RETURN_HOLD = 2.0;  // case1: giữ 2 s trên điểm cất cánh rồi mới hạ
 const double LAND_TIME = 6.0;    // hạ cánh trong 6 s
 const double BELOW_GROUND = 0.1; // đích hạ thấp hơn mặt đất 10 cm để P01 tự giảm lực
 
@@ -59,6 +63,9 @@ public:
         // case1_speed: tốc độ pha Case I (0,25 = bản đã bay; 0,5; 1 = tốc độ bài báo).
         // Cùng một hình quỹ đạo, tốc độ gấp đôi thì thời gian bay giảm một nửa, gia tốc gấp 4.
         case1_speed_ = declare_parameter<double>("case1_speed", 0.25);
+        // return_home: sau Case I bay về trên điểm cất cánh rồi mới hạ, để lần bay sau vẫn xuất phát từ gốc.
+        // Lý do: log 21/11 cho thấy sai số tăng theo khoảng cách tới gốc tọa độ PX4.
+        return_home_ = declare_parameter<bool>("return_home", true);
         case1_duration_ = CASE1_RAMP + CASE1_PHASE / case1_speed_;   // 30 s ở 0,25×; 17 s ở 0,5×; 10,5 s ở 1×
         const auto csv = declare_parameter<std::string>("log_csv", "");     // rỗng = không ghi CSV
 
@@ -140,20 +147,37 @@ private:
         const double t = std::max(0.0, now - T_CLIMB);
         const double t_active = CLIMB_TIME + HOLD_AFTER_CLIMB;   // 7 s
         const double case1_end = t_active + SETTLE + case1_duration_;   // t lúc hết quỹ đạo (40 s ở 0,25×)
-        const double t_land = (mode_ == "case1") ? case1_end + HOLD_END : CLIMB_TIME + hover_time_;
+        const double t_return = case1_end + HOLD_END;   // case1: bắt đầu bay về
+        const double t_land = (mode_ == "case1")
+            ? t_return + (return_home_ ? RETURN_TIME + RETURN_HOLD : 0.0)
+            : CLIMB_TIME + hover_time_;
         P01Reference ref;
         int stage;
         if (t < t_land)
         {
             if (t < t_active || mode_ != "case1")
                 ref = reference_takeoff(t, origin_, heading_, HEIGHT, CLIMB_TIME);   // lên cao rồi giữ
+            else if (t >= t_return)
+            {
+                // Bay về: thẳng ngang từ điểm cuối Case I tới ngay trên điểm cất cánh, độ cao giữ nguyên.
+                if (!returning_)
+                {
+                    return_from_ = last_ref_x_;
+                    returning_ = true;
+                    RCLCPP_INFO(get_logger(), "Bay về trên điểm cất cánh");
+                }
+                Vector3 home = origin_;
+                home.z() = return_from_.z();
+                ref = reference_return(t - t_return, return_from_, home, RETURN_TIME, heading_);
+            }
             else
             {
                 Vector3 top = origin_;
                 top.z() -= HEIGHT;   // NED: lên cao = z giảm
                 ref = reference_x500_case1(t - t_active - SETTLE, top, heading_, case1_speed_, CASE1_RAMP, case1_duration_);
             }
-            stage = (now < T_CLIMB) ? 0 : (t < t_active ? 7 : 3);
+            // stage 5 = bay về (không tính vào sai số Case I).
+            stage = (now < T_CLIMB) ? 0 : (t < t_active ? 7 : (mode_ == "case1" && t >= t_return ? 5 : 3));
         }
         else
         {
@@ -244,6 +268,8 @@ private:
     std::string mode_;
     double hover_time_ = 20.0;
     double case1_speed_ = 0.25, case1_duration_ = 30.0;
+    bool return_home_ = true, returning_ = false;
+    Vector3 return_from_ = Vector3::Zero();
     P01Parameters params_;
     X500Actuators motors_;
     P01State state_;
