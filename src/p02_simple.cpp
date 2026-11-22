@@ -12,6 +12,8 @@
 //   case1: 0–6 lên 2 m │ 7–10 chờ │ 10–(10+T) bay Case I │ giữ 5 s │ 8 s bay về trên điểm cất cánh │ giữ 2 s
 //          │ 6 s hạ cánh │ disarm │ tự tắt   (return_home:=false bỏ đoạn bay về, hạ tại điểm cuối như cũ)
 //          T = 4 + 6,5/case1_speed: 30 s ở 0,25× (mặc định), 17 s ở 0,5×, 10,5 s ở 1×
+//   figure8: 0–6 lên 2 m │ 7–10 chờ │ bay số 8 quanh điểm ngay trên chỗ cất cánh, T = fig8_laps·fig8_period_s + 4
+//          (mặc định 2 vòng × 10 s + 4 = 24 s) │ giữ 5 s tại tâm │ 6 s hạ cánh │ disarm │ tự tắt
 //   Trước t=0 (2 s đầu của node): heartbeat, lệnh Offboard ở 1 s, lệnh arm ở 1,5 s.
 //
 // Ctrl+C giữa chừng: PX4 mất heartbeat → tự Return và hạ cánh (failsafe).
@@ -33,6 +35,7 @@
 #include "uav_research/x500_control.hpp"
 #include "uav_research/p01_telemetry.hpp"
 #include "uav_research/p01_return_reference.hpp"
+#include "uav_research/p01_figure8_reference.hpp"
 #include "uav_research/gz_ground_truth.hpp"
 #include "uav_research/p02_controller.hpp"
 
@@ -64,7 +67,7 @@ public:
     P02Simple() : Node("p02_simple")
     {
         // Chỉ 2 tham số: chọn quỹ đạo và tên file CSV.
-        mode_ = declare_parameter<std::string>("reference_mode", "hover");   // hover | case1
+        mode_ = declare_parameter<std::string>("reference_mode", "hover");   // hover | case1 | figure8
         hover_time_ = declare_parameter<double>("hover_time_s", 20.0);       // hover giữ bao lâu
         // case1_speed: tốc độ pha Case I (0,25 = bản đã bay; 0,5; 1 = tốc độ bài báo).
         // Cùng một hình quỹ đạo, tốc độ gấp đôi thì thời gian bay giảm một nửa, gia tốc gấp 4.
@@ -79,6 +82,16 @@ public:
         if (use_gt_ && !gt_.start("/model/x500_0/odometry"))
             RCLCPP_ERROR(get_logger(), "Không đăng ký được topic Gazebo /model/x500_0/odometry");
         case1_duration_ = CASE1_RAMP + CASE1_PHASE / case1_speed_;   // 30 s ở 0,25×; 17 s ở 0,5×; 10,5 s ở 1×
+        // Quỹ đạo số 8 (reference_mode:=figure8): dọc = a·sin θ, ngang = b·sin 2θ, θ = 2π·t/period.
+        // Giảm fig8_period_s để bay gắt hơn (gia tốc tỉ lệ 1/period²).
+        fig8_a_ = declare_parameter<double>("fig8_a", 1.5);              // nửa chiều dài dọc hướng mũi (m)
+        fig8_b_ = declare_parameter<double>("fig8_b", 0.75);             // biên độ ngang (m)
+        fig8_period_ = declare_parameter<double>("fig8_period_s", 10.0); // thời gian một vòng số 8 (s)
+        fig8_laps_ = static_cast<int>(declare_parameter<int>("fig8_laps", 2));   // số vòng
+        fig8_duration_ = figure8_duration(fig8_period_, fig8_laps_, CASE1_RAMP);
+        if (mode_ == "figure8")
+            RCLCPP_INFO(get_logger(), "Quỹ đạo số 8: a=%.2f m, b=%.2f m, chu kỳ %.1f s, %d vòng, bay %.1f s",
+                fig8_a_, fig8_b_, fig8_period_, fig8_laps_, fig8_duration_);
         const auto csv = declare_parameter<std::string>("log_csv", "");     // rỗng = không ghi CSV
 
         // Tham số vật lý X500 và hệ số điều khiển: lấy nguyên bộ đã bay tốt.
@@ -197,18 +210,21 @@ private:
         // 4. Tham chiếu theo thời gian. t = giây kể từ lúc bắt đầu cất cánh.
         const double t = std::max(0.0, now - T_CLIMB);
         const double t_active = CLIMB_TIME + HOLD_AFTER_CLIMB;   // 7 s
-        const double case1_end = t_active + SETTLE + case1_duration_;   // t lúc hết quỹ đạo (40 s ở 0,25×)
+        const bool is_traj = (mode_ == "case1" || mode_ == "figure8");   // có bay quỹ đạo (không chỉ treo)
+        const double traj_duration = (mode_ == "figure8") ? fig8_duration_ : case1_duration_;
+        const double case1_end = t_active + SETTLE + traj_duration;   // t lúc hết quỹ đạo (40 s ở Case I 0,25×)
         const double t_return = case1_end + HOLD_END;   // case1: bắt đầu bay về
-        const double t_land = (mode_ == "case1")
-            ? t_return + (return_home_ ? RETURN_TIME + RETURN_HOLD : 0.0)
+        // figure8 kết thúc đúng tại tâm (ngay trên điểm cất cánh) nên không cần bay về.
+        const double t_land = is_traj
+            ? t_return + ((mode_ == "case1" && return_home_) ? RETURN_TIME + RETURN_HOLD : 0.0)
             : CLIMB_TIME + hover_time_;
         P01Reference ref;
         int stage;
         if (t < t_land)
         {
-            if (t < t_active || mode_ != "case1")
+            if (t < t_active || !is_traj)
                 ref = reference_takeoff(t, origin_, heading_, HEIGHT, CLIMB_TIME);   // lên cao rồi giữ
-            else if (t >= t_return)
+            else if (mode_ == "case1" && t >= t_return)
             {
                 // Bay về: thẳng ngang từ điểm cuối Case I tới ngay trên điểm cất cánh, độ cao giữ nguyên.
                 if (!returning_)
@@ -225,7 +241,10 @@ private:
             {
                 Vector3 top = origin_;
                 top.z() -= HEIGHT;   // NED: lên cao = z giảm
-                ref = reference_x500_case1(t - t_active - SETTLE, top, heading_, case1_speed_, CASE1_RAMP, case1_duration_);
+                if (mode_ == "figure8")
+                    ref = reference_figure8(t - t_active - SETTLE, top, heading_, fig8_a_, fig8_b_, fig8_period_, fig8_laps_, CASE1_RAMP);
+                else
+                    ref = reference_x500_case1(t - t_active - SETTLE, top, heading_, case1_speed_, CASE1_RAMP, case1_duration_);
             }
             // stage 5 = bay về (không tính vào sai số Case I).
             stage = (now < T_CLIMB) ? 0 : (t < t_active ? 7 : (mode_ == "case1" && t >= t_return ? 5 : 3));
@@ -338,6 +357,8 @@ private:
     std::string mode_;
     double hover_time_ = 20.0;
     double case1_speed_ = 0.25, case1_duration_ = 30.0;
+    double fig8_a_ = 1.5, fig8_b_ = 0.75, fig8_period_ = 10.0, fig8_duration_ = 24.0;
+    int fig8_laps_ = 2;
     bool return_home_ = true, returning_ = false;
     bool use_gt_ = false;
     GzGroundTruth gt_;
