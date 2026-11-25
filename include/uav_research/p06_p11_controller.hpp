@@ -36,6 +36,7 @@ struct AdaptiveGains
     double gamma_x = 1.0;     // tốc độ thích nghi lực
     double gamma_R = 0.1;     // tốc độ thích nghi mômen
     double B_theta_x = 10.0;  // chặn ‖θ̄_x‖ (N) của phép chiếu (projection)
+    double B_theta_R = 1e9;   // chặn ‖θ̄_R‖ (N.m), CHỐNG WINDUP (không có trong bài; mặc định = tắt)
 };
 
 struct AdaptiveControl : P01Control
@@ -185,6 +186,10 @@ public:
             o.theta_R_dot = adapting ? Vector3(g.gamma_R * Vector3(ew_c2eb.dot(b1), ew_c2eb.dot(b2), o.ewy + g.c3 * o.ey))
                                      : Vector3::Zero();
         }
+        // Chống windup θ̄_R (bổ sung của đồ án, không có trong P06/P11): phép chiếu giữ ‖θ̄_R‖ ≤ B_theta_R,
+        // cùng dạng phép chiếu của θ̄_x. θ̄_R không có đạo hàm trong luật mômen nên không cần sửa gì thêm.
+        if (adapting && th_R.norm() >= g.B_theta_R && th_R.dot(o.theta_R_dot) > 0.0)
+            o.theta_R_dot -= th_R * th_R.dot(o.theta_R_dot) / th_R.squaredNorm();
         if (!std::isfinite(o.f) || !o.M.allFinite()) throw std::runtime_error("P06/P11 control contains non-finite values");
         return o;
     }

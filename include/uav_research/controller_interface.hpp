@@ -132,9 +132,9 @@ public:
     }
     std::string describe() const override
     {
-        char b[160];
-        std::snprintf(b, sizeof b, "gamma_x=%.3f gamma_R=%.3f B_theta_x=%.1f c1=%.3f c2=%.3f c3=%.3f",
-                      g_.gamma_x, g_.gamma_R, g_.B_theta_x, g_.c1, g_.c2, g_.c3);
+        char b[200];
+        std::snprintf(b, sizeof b, "gamma_x=%.3f gamma_R=%.3f B_theta_x=%.1f B_theta_R=%.3g c1=%.3f c2=%.3f c3=%.3f",
+                      g_.gamma_x, g_.gamma_R, g_.B_theta_x, g_.B_theta_R, g_.c1, g_.c2, g_.c3);
         return b;
     }
 

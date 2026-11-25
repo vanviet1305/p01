@@ -42,6 +42,7 @@
 #include "uav_research/p01_figure8_reference.hpp"
 #include "uav_research/circle_yaw_reference.hpp"
 #include "uav_research/gz_ground_truth.hpp"
+#include "uav_research/gz_wrench.hpp"
 #include "uav_research/controller_interface.hpp"
 
 using namespace uav_research;
@@ -69,6 +70,12 @@ const double BELOW_GROUND = 0.1; // đích hạ thấp hơn mặt đất 10 cm �
 class UavSimple : public rclcpp::Node
 {
 public:
+    // Ctrl+C hoặc tự tắt: xóa nhiễu ngoài nếu còn, để chuyến sau không bị lực cũ.
+    ~UavSimple() override
+    {
+        if (dist_active_) wrench_.clear();
+    }
+
     UavSimple() : Node("uav_simple")
     {
         // Chỉ 2 tham số: chọn quỹ đạo và tên file CSV.
@@ -123,16 +130,48 @@ public:
         params_.attitude_scale *= att_bw_scale_ * att_bw_scale_;
         params_.rate_scale *= att_bw_scale_;
         // mass_kg: khối lượng BỘ ĐIỀU KHIỂN tin là đúng (UAV thật trong Gazebo: x500 2,064 kg; x650 3,0 kg).
-        // Khai sai = tạo nhiễu lực cố định để thử P01 / P02. Hệ số kx, kv tính theo khối lượng khai.
+        // Khai sai = tạo nhiễu lực cố định để thử các bộ điều khiển. Hệ số kx, kv tính theo gain_mass_kg (bên dưới).
+        const double m_danh_dinh = params_.m;   // khối lượng danh định của mô hình đã chọn (vehicle)
         params_.m = declare_parameter<double>("mass_kg", params_.m);
-        params_.kx = 4.0 * params_.m;
-        params_.kv = 3.2 * params_.m;
+        // gain_mass_kg: khối lượng dùng để TÍNH HỆ SỐ k_x = 4·m, k_v = 3,2·m (và k_i mặc định của P02).
+        // Mặc định = khối lượng danh định → khai sai mass_kg chỉ làm sai phần mô hình (bù trọng lực, bù đón trước),
+        // hệ số phản hồi giữ nguyên → so sánh "khai đúng/khai sai" chỉ khác đúng phần bất định.
+        // (Trước 25/11/2026 17:30, hệ số tính theo mass_kg; muốn tái lập: -p gain_mass_kg:=<mass_kg>.)
+        gain_mass_ = declare_parameter<double>("gain_mass_kg", m_danh_dinh);
+        params_.kx = 4.0 * gain_mass_;
+        params_.kv = 3.2 * gain_mass_;
         // motor_k_scale: hệ số lực motor mà BỘ ĐIỀU KHIỂN tin = k thật (Gazebo) × scale.
         // 1,1 = tin motor khỏe hơn 10% → lệnh u thấp hơn cần thiết → mỗi rotor chỉ ra ~91% lực yêu cầu.
         // Mô phỏng sai đường cong lực/bàn đo lực trên máy bay thật: sai cả lực tổng lẫn mômen.
         const double motor_k_scale = declare_parameter<double>("motor_k_scale", 1.0);
         motors_.motor_constant *= motor_k_scale;
 
+        // antiwindup: ngừng cập nhật trạng thái bên trong (tích phân P02, θ̄ của P06/P11) ở bước ngay sau
+        // một bước motor bão hòa (tích phân có điều kiện). Bổ sung của đồ án; mặc định tắt để giữ kết quả cũ.
+        antiwindup_ = declare_parameter<bool>("antiwindup", false);
+
+        // NHIỄU NGOÀI (Gazebo ApplyLinkWrench, xem gz_wrench.hpp): lực/mômen hằng bật tại t = dist_t_on, tắt tại
+        // dist_t_off (t tính từ lúc bắt đầu cất cánh, như CSV). Hệ NED thế giới: dist_fz > 0 = kéo xuống.
+        // payload_kg: tiện dùng, cộng payload_kg·g vào dist_fz (chỉ trọng lượng, không có khối lượng quán tính).
+        // dist_t_on < 0 = tắt (mặc định). Nhiễu GIỮ NGUYÊN qua cả lúc hạ cánh, chỉ xóa khi node kết thúc
+        // (25/11/2026: trước đây xóa lúc bắt đầu hạ → tích phân P02 / θ̄ đang giữ bù lực cũ (ngừng cập nhật khi hạ)
+        //  và P01 mất lệch cố định → UAV vọt lên ~40 cm hoặc trôi ngang ~35 cm khi hạ cánh).
+        {
+            const double payload = declare_parameter<double>("payload_kg", 0.0);
+            dist_f_ = Vector3(declare_parameter<double>("dist_fx", 0.0), declare_parameter<double>("dist_fy", 0.0),
+                              declare_parameter<double>("dist_fz", 0.0) + payload * 9.81);
+            dist_t_ = Vector3(declare_parameter<double>("dist_tx", 0.0), declare_parameter<double>("dist_ty", 0.0),
+                              declare_parameter<double>("dist_tz", 0.0));
+            dist_on_ = declare_parameter<double>("dist_t_on", -1.0);
+            dist_off_ = declare_parameter<double>("dist_t_off", -1.0);
+            use_dist_ = dist_on_ >= 0.0 && (dist_f_.norm() > 0.0 || dist_t_.norm() > 0.0);
+            if (use_dist_)
+            {
+                wrench_.start("default", vehicle_ + "_0");
+                RCLCPP_INFO(get_logger(), "Nhiễu ngoài: F_NED=(%.2f,%.2f,%.2f) N, T=(%.3f,%.3f,%.3f) N.m, bật t=%.1f s, tắt t=%.1f s",
+                    dist_f_.x(), dist_f_.y(), dist_f_.z(), dist_t_.x(), dist_t_.y(), dist_t_.z(), dist_on_, dist_off_);
+            }
+        }
         // Chọn bộ điều khiển. Tham số riêng của từng bộ chỉ được khai báo khi chọn bộ đó.
         const auto controller = declare_parameter<std::string>("controller", "p01");
         if (controller == "p01")
@@ -141,9 +180,9 @@ public:
         }
         else if (controller == "p02")
         {
-            // Hệ số P02 (mặc định xem P02Gains). ki mặc định = 1.0 * mass_kg khai báo.
+            // Hệ số P02 (mặc định xem P02Gains). ki mặc định = 1.0 * gain_mass_kg.
             P02Gains g;
-            g.ki = declare_parameter<double>("ki", 1.0 * params_.m);
+            g.ki = declare_parameter<double>("ki", 1.0 * gain_mass_);
             g.c1 = declare_parameter<double>("c1", g.c1);
             g.sigma = declare_parameter<double>("sigma", g.sigma);
             g.c2 = declare_parameter<double>("c2", g.c2);
@@ -160,6 +199,7 @@ public:
             g.gamma_x = declare_parameter<double>("gamma_x", g.gamma_x);
             g.gamma_R = declare_parameter<double>("gamma_R", g.gamma_R);
             g.B_theta_x = declare_parameter<double>("B_theta_x", g.B_theta_x);
+            g.B_theta_R = declare_parameter<double>("B_theta_R", g.B_theta_R);   // chống windup θ̄_R; mặc định tắt
             g.c1 = declare_parameter<double>("c1", g.c1);
             g.c2 = declare_parameter<double>("c2", g.c2);
             g.c3 = declare_parameter<double>("c3", g.c3);
@@ -185,15 +225,15 @@ public:
             log_.open(csv);
             log_ << "t,x,y,z,xd,yd,zd,position_error,Psi,f_requested,f_achieved,"
                     "Mx,My,Mz,Mx_achieved,My_achieved,Mz_achieved,u0,u1,u2,u3,saturated,stage,control_blend"
-                 << ctrl_->csv_header() << ",state_source_gazebo,ekf_x,ekf_y,ekf_z,ekf_tilt_err_deg\n";
+                 << ctrl_->csv_header() << ",state_source_gazebo,ekf_x,ekf_y,ekf_z,ekf_tilt_err_deg,dist_active\n";
         }
 
         // 1 timer 100 Hz: TOÀN BỘ việc điều khiển nằm trong loop().
         start_ = std::chrono::steady_clock::now();
         last_loop_ = start_;
         timer_ = create_wall_timer(std::chrono::milliseconds(10), [this]() { loop(); });
-        RCLCPP_INFO(get_logger(), "uav_simple: controller=%s vehicle=%s att_bw_scale=%.2f reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f %s (CHỈ DÙNG TRONG MÔ PHỎNG)",
-            ctrl_->name().c_str(), vehicle_.c_str(), att_bw_scale_, mode_.c_str(), params_.m, case1_speed_, motor_k_scale, ctrl_->describe().c_str());
+        RCLCPP_INFO(get_logger(), "uav_simple: controller=%s vehicle=%s att_bw_scale=%.2f reference_mode=%s mass_kg=%.3f gain_mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f antiwindup=%d %s (CHỈ DÙNG TRONG MÔ PHỎNG)",
+            ctrl_->name().c_str(), vehicle_.c_str(), att_bw_scale_, mode_.c_str(), params_.m, gain_mass_, case1_speed_, motor_k_scale, antiwindup_, ctrl_->describe().c_str());
     }
 
 private:
@@ -350,17 +390,29 @@ private:
             }
         }
         last_ref_x_ = ref.x;
+        // Nhiễu ngoài: bật đúng một lần (persistent cộng dồn), tắt đúng một lần.
+        if (use_dist_ && !dist_active_ && !dist_done_ && !landing_ && t >= dist_on_)
+        {
+            if (wrench_.apply(dist_f_, dist_t_)) { dist_active_ = true; RCLCPP_INFO(get_logger(), "Bật nhiễu ngoài tại t=%.2f s", t); }
+            else RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1000, "Chưa gửi được nhiễu ngoài (chưa có bên nhận wrench)");
+        }
+        if (dist_active_ && dist_off_ >= 0.0 && t >= dist_off_)
+        {
+            wrench_.clear(); dist_active_ = false; dist_done_ = true;
+            RCLCPP_INFO(get_logger(), "Tắt nhiễu ngoài tại t=%.2f s", t);
+        }
         last_ref_b1_ = ref.b1;
 
         // 5. Bộ điều khiển đã chọn: trạng thái + tham chiếu → lực f, mômen M.
         // Tích phân từ lúc bắt đầu cất cánh (stage 7) để khử lệch trước khi bay Case I.
         // Tích phân cả lúc bay về (stage 5). Không tích phân lúc chờ trước cất cánh (stage 0)
         // và lúc hạ cánh (stage 4, đích dưới mặt đất).
-        const bool integrate = (stage == 7 || stage == 3 || stage == 5);
+        const bool integrate = (stage == 7 || stage == 3 || stage == 5) && !(antiwindup_ && last_saturated_);
         const P01Control c = ctrl_->compute(state_, params_, ref, dt, integrate);
 
         // 6. Phân bổ: f, M → 4 lệnh rotor u0..u3 (có giới hạn).
         const X500Allocation a = allocate_x500(c.f, c.M, motors_);
+        last_saturated_ = a.saturated;
 
         // 7. Gửi lệnh motor. Kênh 5–12 để NaN = không dùng.
         Motors m{};
@@ -388,7 +440,8 @@ private:
             // EKF2 so với trạng thái đang dùng: lệch vị trí và góc lệch trục z thân (nghiêng).
             log_ << ',' << use_gt_;
             for (int i = 0; i < 3; ++i) log_ << ',' << px4_x_[i];
-            log_ << ',' << std::acos(std::clamp(px4_R_.col(2).dot(state_.R.col(2)), -1.0, 1.0)) * 180.0 / M_PI << '\n';
+            log_ << ',' << std::acos(std::clamp(px4_R_.col(2).dot(state_.R.col(2)), -1.0, 1.0)) * 180.0 / M_PI
+                 << ',' << dist_active_ << '\n';
         }
     }
 
@@ -418,6 +471,10 @@ private:
     bool return_home_ = true, returning_ = false;
     bool use_gt_ = false;
     GzGroundTruth gt_;
+    GzWrench wrench_;
+    Vector3 dist_f_ = Vector3::Zero(), dist_t_ = Vector3::Zero();
+    double dist_on_ = -1.0, dist_off_ = -1.0;
+    bool use_dist_ = false, dist_active_ = false, dist_done_ = false;
     Vector3 px4_x_ = Vector3::Zero();          // vị trí EKF2 (ghi CSV để so với trạng thái thật)
     Matrix3 px4_R_ = Matrix3::Identity();      // tư thế EKF2
     Vector3 return_from_ = Vector3::Zero();
@@ -425,6 +482,8 @@ private:
     double att_bw_scale_ = 1.0;
     P01Parameters params_;
     std::unique_ptr<Controller> ctrl_;   // bộ điều khiển đã chọn (P01Ctrl, P02Ctrl, ...)
+    bool antiwindup_ = false, last_saturated_ = false;
+    double gain_mass_ = 0.0;
     bool reset_on_ground_ = false;   // đã xóa tích phân lúc chạm đất chưa
     X500Actuators motors_;
     P01State state_;
