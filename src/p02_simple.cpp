@@ -103,6 +103,12 @@ public:
         // Tham số vật lý + hệ số điều khiển theo mô hình (x500: bộ đã bay tốt; x650: ước lượng, xem x500_control.hpp).
         params_ = vehicle_ == "x650" ? x650_parameters() : x500_parameters();
         motors_ = vehicle_ == "x650" ? x650_actuators() : X500Actuators{};
+        // att_bw_scale (s): co băng thông vòng tư thế. kR nhân s², kOmega nhân s -> giữ hệ số tắt dần, tần số riêng nhân s.
+        // Dùng khi motor chậm (x650) làm vòng tư thế dao động. Mặc định 1 = giữ nguyên.
+        att_bw_scale_ = declare_parameter<double>("att_bw_scale", 1.0);
+        if (!(att_bw_scale_ > 0.0)) throw std::invalid_argument("att_bw_scale phải > 0");
+        params_.attitude_scale *= att_bw_scale_ * att_bw_scale_;
+        params_.rate_scale *= att_bw_scale_;
         // mass_kg: khối lượng BỘ ĐIỀU KHIỂN tin là đúng (UAV thật trong Gazebo: x500 2,064 kg; x650 3,0 kg).
         // Khai sai = tạo nhiễu lực cố định để thử P01 / P02. Hệ số kx, kv tính theo khối lượng khai.
         params_.m = declare_parameter<double>("mass_kg", params_.m);
@@ -147,8 +153,8 @@ public:
         start_ = std::chrono::steady_clock::now();
         last_loop_ = start_;
         timer_ = create_wall_timer(std::chrono::milliseconds(10), [this]() { loop(); });
-        RCLCPP_INFO(get_logger(), "p02_simple: vehicle=%s reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f ki=%.2f c1=%.2f sigma=%.2f kI=(%.3f,%.3f) c2=%.2f integral=%d (CHỈ DÙNG TRONG MÔ PHỎNG)",
-            vehicle_.c_str(), mode_.c_str(), params_.m, case1_speed_, motor_k_scale, gains_.ki, gains_.c1, gains_.sigma, kI_xy, kI_z, gains_.c2, use_integral_);
+        RCLCPP_INFO(get_logger(), "p02_simple: vehicle=%s att_bw_scale=%.2f reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f ki=%.2f c1=%.2f sigma=%.2f kI=(%.3f,%.3f) c2=%.2f integral=%d (CHỈ DÙNG TRONG MÔ PHỎNG)",
+            vehicle_.c_str(), att_bw_scale_, mode_.c_str(), params_.m, case1_speed_, motor_k_scale, gains_.ki, gains_.c1, gains_.sigma, kI_xy, kI_z, gains_.c2, use_integral_);
     }
 
 private:
@@ -373,6 +379,7 @@ private:
     Matrix3 px4_R_ = Matrix3::Identity();      // tư thế EKF2
     Vector3 return_from_ = Vector3::Zero();
     std::string vehicle_;
+    double att_bw_scale_ = 1.0;
     P01Parameters params_;
     P02Gains gains_;
     P02Controller ctrl_;
