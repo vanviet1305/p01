@@ -101,8 +101,9 @@ public:
         params_ = vehicle_ == "x650" ? x650_parameters() : x500_parameters();
         motors_ = vehicle_ == "x650" ? x650_actuators() : X500Actuators{};
         // att_bw_scale (s): co băng thông vòng tư thế. kR nhân s², kOmega nhân s -> giữ hệ số tắt dần, tần số riêng nhân s.
-        // Dùng khi motor chậm (x650) làm vòng tư thế dao động. Mặc định 1 = giữ nguyên.
-        att_bw_scale_ = declare_parameter<double>("att_bw_scale", 1.0);
+        // Dùng khi motor chậm (x650) làm vòng tư thế dao động.
+        // Mặc định: x500 = 1,0; x650 = 0,7 (s = 1 làm roll dao động 2,2 Hz ở Case I 1x, xem x650_p01_case1x10_g1 / _bw07_g1).
+        att_bw_scale_ = declare_parameter<double>("att_bw_scale", vehicle_ == "x650" ? 0.7 : 1.0);
         if (!(att_bw_scale_ > 0.0)) throw std::invalid_argument("att_bw_scale phải > 0");
         params_.attitude_scale *= att_bw_scale_ * att_bw_scale_;
         params_.rate_scale *= att_bw_scale_;
