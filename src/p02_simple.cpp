@@ -78,9 +78,14 @@ public:
         // state_source: "px4" = trạng thái EKF2 (mặc định, như cũ); "gazebo" = vị trí/tư thế/vận tốc THẬT từ Gazebo
         // (/model/x500_0/odometry, cần chạy tools/gan_odom_gazebo.sh trước). Vận tốc góc luôn lấy từ PX4 (con quay).
         // Lý do: EKF2 ước lượng sai roll 1–4° khi bay gắt (log 21/11), làm lẫn lỗi ước lượng vào so sánh bộ điều khiển.
+        // vehicle: mô hình UAV đang chạy trong Gazebo (x500 | x650). Phải khớp lệnh make px4_sitl gz_<vehicle>.
+        vehicle_ = declare_parameter<std::string>("vehicle", "x500");
+        if (vehicle_ != "x500" && vehicle_ != "x650")
+            throw std::invalid_argument("vehicle phải là x500 hoặc x650");
         use_gt_ = declare_parameter<std::string>("state_source", "px4") == "gazebo";
-        if (use_gt_ && !gt_.start("/model/x500_0/odometry"))
-            RCLCPP_ERROR(get_logger(), "Không đăng ký được topic Gazebo /model/x500_0/odometry");
+        const std::string gt_topic = "/model/" + vehicle_ + "_0/odometry";
+        if (use_gt_ && !gt_.start(gt_topic))
+            RCLCPP_ERROR(get_logger(), "Không đăng ký được topic Gazebo %s", gt_topic.c_str());
         case1_duration_ = CASE1_RAMP + CASE1_PHASE / case1_speed_;   // 30 s ở 0,25×; 17 s ở 0,5×; 10,5 s ở 1×
         // Quỹ đạo số 8 (reference_mode:=figure8): dọc = a·sin θ, ngang = b·sin 2θ, θ = 2π·t/period.
         // Giảm fig8_period_s để bay gắt hơn (gia tốc tỉ lệ 1/period²).
@@ -95,8 +100,10 @@ public:
         const auto csv = declare_parameter<std::string>("log_csv", "");     // rỗng = không ghi CSV
 
         // Tham số vật lý X500 và hệ số điều khiển: lấy nguyên bộ đã bay tốt.
-        params_ = x500_parameters();
-        // mass_kg: khối lượng BỘ ĐIỀU KHIỂN tin là đúng (UAV thật trong Gazebo vẫn 2,064 kg).
+        // Tham số vật lý + hệ số điều khiển theo mô hình (x500: bộ đã bay tốt; x650: ước lượng, xem x500_control.hpp).
+        params_ = vehicle_ == "x650" ? x650_parameters() : x500_parameters();
+        motors_ = vehicle_ == "x650" ? x650_actuators() : X500Actuators{};
+        // mass_kg: khối lượng BỘ ĐIỀU KHIỂN tin là đúng (UAV thật trong Gazebo: x500 2,064 kg; x650 3,0 kg).
         // Khai sai = tạo nhiễu lực cố định để thử P01 / P02. Hệ số kx, kv tính theo khối lượng khai.
         params_.m = declare_parameter<double>("mass_kg", params_.m);
         params_.kx = 4.0 * params_.m;
@@ -140,8 +147,8 @@ public:
         start_ = std::chrono::steady_clock::now();
         last_loop_ = start_;
         timer_ = create_wall_timer(std::chrono::milliseconds(10), [this]() { loop(); });
-        RCLCPP_INFO(get_logger(), "p02_simple: reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f ki=%.2f c1=%.2f sigma=%.2f kI=(%.3f,%.3f) c2=%.2f integral=%d (CHỈ DÙNG TRONG MÔ PHỎNG)",
-            mode_.c_str(), params_.m, case1_speed_, motor_k_scale, gains_.ki, gains_.c1, gains_.sigma, kI_xy, kI_z, gains_.c2, use_integral_);
+        RCLCPP_INFO(get_logger(), "p02_simple: vehicle=%s reference_mode=%s mass_kg=%.3f case1_speed=%.2f motor_k_scale=%.2f ki=%.2f c1=%.2f sigma=%.2f kI=(%.3f,%.3f) c2=%.2f integral=%d (CHỈ DÙNG TRONG MÔ PHỎNG)",
+            vehicle_.c_str(), mode_.c_str(), params_.m, case1_speed_, motor_k_scale, gains_.ki, gains_.c1, gains_.sigma, kI_xy, kI_z, gains_.c2, use_integral_);
     }
 
 private:
@@ -365,6 +372,7 @@ private:
     Vector3 px4_x_ = Vector3::Zero();          // vị trí EKF2 (ghi CSV để so với trạng thái thật)
     Matrix3 px4_R_ = Matrix3::Identity();      // tư thế EKF2
     Vector3 return_from_ = Vector3::Zero();
+    std::string vehicle_;
     P01Parameters params_;
     P02Gains gains_;
     P02Controller ctrl_;

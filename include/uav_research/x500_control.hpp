@@ -137,4 +137,31 @@ inline X500Allocation allocate_x500(double f, const Vector3 &moment,
     out.saturated = std::abs(out.achieved_f-f) > 1e-8 || (out.achieved_M-moment).norm() > 1e-8;
     return out;
 }
+// ===== X650 (mô hình Gazebo x650, nhân bản từ x500, 25/11/2026) =====
+// Số ƯỚC LƯỢNG theo cấu hình X650 + 4x MN4014 KV330 + cánh 1555 + pin 6S; thay bằng số đo khi có máy thật.
+// Khớp PX4-Autopilot/Tools/simulation/gz/models/x650_base + x650 và airframe 4022_gz_x650.
+inline P01Parameters x650_parameters()
+{
+    P01Parameters p;
+    p.m = 3.0;                                              // kg: thân 2,9357 + 4 rotor 0,0161
+    p.J = Vector3(0.05999, 0.06009, 0.11200).asDiagonal();  // kg.m²: thân + rotor quy về khối tâm
+    p.kx = 4.0 * p.m;
+    p.kv = 3.2 * p.m;
+    // Hệ số tư thế/vận tốc góc nhân theo tỉ lệ J (x650/x500) để giữ nguyên tần số riêng vòng tư thế.
+    p.attitude_scale = Vector3(1.5 * 0.05999 / 0.02383948, 1.5 * 0.06009 / 0.02394241, 0.35 * 0.11200 / 0.04399995);
+    p.rate_scale = Vector3(0.35 * 0.05999 / 0.02383948, 0.35 * 0.06009 / 0.02394241, 0.22 * 0.11200 / 0.04399995);
+    return p;
+}
+
+inline X500Actuators x650_actuators()
+{
+    X500Actuators a;
+    a.arm = 0.23;              // m, theo x/y thân
+    a.moment_ratio = 0.016;    // m, momentConstant (chưa đo)
+    a.motor_constant = 6.4e-5; // N/(rad/s)^2, motorConstant
+    a.omega_min = 100.0;       // SIM_GZ_EC_MIN của 4022_gz_x650
+    a.omega_max = 630.0;       // SIM_GZ_EC_MAX của 4022_gz_x650
+    return a;
+}
+
 } // namespace uav_research
