@@ -107,5 +107,12 @@ ament_target_dependencies(p02_simple rclcpp px4_msgs geometry_msgs std_msgs)
 target_link_libraries(p02_simple Eigen3::Eigen gz-transport13::gz-transport13 gz-msgs10::gz-msgs10)
 install(TARGETS p02_simple DESTINATION lib/${PROJECT_NAME})
 
+# Node chung uav_simple: chọn bộ điều khiển bằng controller:=p01|p02 (giao diện controller_interface.hpp). Chỉ dùng trong Gazebo.
+add_executable(uav_simple src/uav_simple.cpp)
+target_include_directories(uav_simple PRIVATE include)
+ament_target_dependencies(uav_simple rclcpp px4_msgs geometry_msgs std_msgs)
+target_link_libraries(uav_simple Eigen3::Eigen gz-transport13::gz-transport13 gz-msgs10::gz-msgs10)
+install(TARGETS uav_simple DESTINATION lib/${PROJECT_NAME})
+
 # Đăng ký thông tin package với ament; giữ ở cuối cấu hình.
 ament_package()
