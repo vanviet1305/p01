@@ -1,4 +1,4 @@
-// NODE CHUNG uav_simple — CHỌN BỘ ĐIỀU KHIỂN BẰNG controller:=p01|p02, CHỈ DÙNG TRONG GAZEBO
+// NODE CHUNG uav_simple — CHỌN BỘ ĐIỀU KHIỂN BẰNG controller:=p01|p02|p06|p11, CHỈ DÙNG TRONG GAZEBO
 //
 // Gộp p01_simple và p02_simple (chép từ p02_simple, 25/11/2026). Phần luật điều khiển gọi qua giao diện
 // Controller (controller_interface.hpp); mọi phần còn lại (giai đoạn bay, quỹ đạo, phân bổ rotor, CSV) dùng chung.
@@ -16,6 +16,8 @@
 //          T = 4 + 6,5/case1_speed: 30 s ở 0,25× (mặc định), 17 s ở 0,5×, 10,5 s ở 1×
 //   figure8: 0–6 lên 2 m │ 7–10 chờ │ bay số 8 quanh điểm ngay trên chỗ cất cánh, T = fig8_laps·fig8_period_s + 4
 //          (mặc định 2 vòng × 10 s + 4 = 24 s) │ giữ 5 s tại tâm │ 6 s hạ cánh │ disarm │ tự tắt
+//   circle_yaw: như figure8 nhưng bay đường tròn r = circle_radius (chu kỳ circle_period_s, circle_laps vòng) và
+//          hướng mũi mong muốn nhảy lệch yaw_offset_deg (mặc định 179,4°) rồi quay với chu kỳ yaw_period_s (thí nghiệm P11 Mục 4.1)
 //   Trước t=0 (2 s đầu của node): heartbeat, lệnh Offboard ở 1 s, lệnh arm ở 1,5 s.
 //
 // Ctrl+C giữa chừng: PX4 mất heartbeat → tự Return và hạ cánh (failsafe).
@@ -38,6 +40,7 @@
 #include "uav_research/p01_telemetry.hpp"
 #include "uav_research/p01_return_reference.hpp"
 #include "uav_research/p01_figure8_reference.hpp"
+#include "uav_research/circle_yaw_reference.hpp"
 #include "uav_research/gz_ground_truth.hpp"
 #include "uav_research/controller_interface.hpp"
 
@@ -69,7 +72,7 @@ public:
     UavSimple() : Node("uav_simple")
     {
         // Chỉ 2 tham số: chọn quỹ đạo và tên file CSV.
-        mode_ = declare_parameter<std::string>("reference_mode", "hover");   // hover | case1 | figure8
+        mode_ = declare_parameter<std::string>("reference_mode", "hover");   // hover | case1 | figure8 | circle_yaw
         hover_time_ = declare_parameter<double>("hover_time_s", 20.0);       // hover giữ bao lâu
         // case1_speed: tốc độ pha Case I (0,25 = bản đã bay; 0,5; 1 = tốc độ bài báo).
         // Cùng một hình quỹ đạo, tốc độ gấp đôi thì thời gian bay giảm một nửa, gia tốc gấp 4.
@@ -96,6 +99,13 @@ public:
         fig8_period_ = declare_parameter<double>("fig8_period_s", 10.0); // thời gian một vòng số 8 (s)
         fig8_laps_ = static_cast<int>(declare_parameter<int>("fig8_laps", 2));   // số vòng
         fig8_duration_ = figure8_duration(fig8_period_, fig8_laps_, CASE1_RAMP);
+        // Đường tròn + yaw quay (reference_mode:=circle_yaw), theo thí nghiệm Mục 4.1 của P11.
+        circ_r_ = declare_parameter<double>("circle_radius", 1.0);          // bán kính (m)
+        circ_period_ = declare_parameter<double>("circle_period_s", 10.0);  // một vòng tròn (s)
+        circ_laps_ = static_cast<int>(declare_parameter<int>("circle_laps", 2));
+        yaw_offset_ = declare_parameter<double>("yaw_offset_deg", 179.4) * M_PI / 180.0;   // lệch yaw lúc bắt đầu
+        yaw_period_ = declare_parameter<double>("yaw_period_s", 40.0);     // chu kỳ quay b1d; 0 = không quay
+        circ_duration_ = circle_yaw_duration(circ_period_, circ_laps_, CASE1_RAMP);
         if (mode_ == "figure8")
             RCLCPP_INFO(get_logger(), "Quỹ đạo số 8: a=%.2f m, b=%.2f m, chu kỳ %.1f s, %d vòng, bay %.1f s",
                 fig8_a_, fig8_b_, fig8_period_, fig8_laps_, fig8_duration_);
@@ -143,9 +153,21 @@ public:
             // use_integral:=false → tắt cộng dồn tích phân (còn lại khác P01 ở dạng mômen (26)).
             ctrl_ = std::make_unique<P02Ctrl>(g, declare_parameter<bool>("use_integral", true));
         }
+        else if (controller == "p06" || controller == "p11")
+        {
+            // Hệ số thích nghi. c1, c2, c3 mặc định tính từ điều kiện của bài với hệ số hiện tại (xem default_gains).
+            AdaptiveGains g = AdaptiveCtrl::default_gains(params_);
+            g.gamma_x = declare_parameter<double>("gamma_x", g.gamma_x);
+            g.gamma_R = declare_parameter<double>("gamma_R", g.gamma_R);
+            g.B_theta_x = declare_parameter<double>("B_theta_x", g.B_theta_x);
+            g.c1 = declare_parameter<double>("c1", g.c1);
+            g.c2 = declare_parameter<double>("c2", g.c2);
+            g.c3 = declare_parameter<double>("c3", g.c3);
+            ctrl_ = std::make_unique<AdaptiveCtrl>(controller == "p11", g);
+        }
         else
         {
-            throw std::invalid_argument("controller phải là p01 hoặc p02");
+            throw std::invalid_argument("controller phải là p01, p02, p06 hoặc p11");
         }
 
         // 3 publisher gửi vào PX4 (/fmu/in) + telemetry cho rqt_plot/RViz.
@@ -240,8 +262,8 @@ private:
         // 4. Tham chiếu theo thời gian. t = giây kể từ lúc bắt đầu cất cánh.
         const double t = std::max(0.0, now - T_CLIMB);
         const double t_active = CLIMB_TIME + HOLD_AFTER_CLIMB;   // 7 s
-        const bool is_traj = (mode_ == "case1" || mode_ == "figure8");   // có bay quỹ đạo (không chỉ treo)
-        const double traj_duration = (mode_ == "figure8") ? fig8_duration_ : case1_duration_;
+        const bool is_traj = (mode_ == "case1" || mode_ == "figure8" || mode_ == "circle_yaw");   // có bay quỹ đạo
+        const double traj_duration = (mode_ == "figure8") ? fig8_duration_ : (mode_ == "circle_yaw" ? circ_duration_ : case1_duration_);
         const double case1_end = t_active + SETTLE + traj_duration;   // t lúc hết quỹ đạo (40 s ở Case I 0,25×)
         const double t_return = case1_end + HOLD_END;   // case1: bắt đầu bay về
         // figure8 kết thúc đúng tại tâm (ngay trên điểm cất cánh) nên không cần bay về.
@@ -271,7 +293,10 @@ private:
             {
                 Vector3 top = origin_;
                 top.z() -= HEIGHT;   // NED: lên cao = z giảm
-                if (mode_ == "figure8")
+                if (mode_ == "circle_yaw")
+                    ref = reference_circle_yaw(t - t_active - SETTLE, top, heading_, circ_r_, circ_period_, circ_laps_, CASE1_RAMP,
+                                               yaw_offset_, yaw_period_);
+                else if (mode_ == "figure8")
                     ref = reference_figure8(t - t_active - SETTLE, top, heading_, fig8_a_, fig8_b_, fig8_period_, fig8_laps_, CASE1_RAMP);
                 else
                     ref = reference_x500_case1(t - t_active - SETTLE, top, heading_, case1_speed_, CASE1_RAMP, case1_duration_);
@@ -285,6 +310,7 @@ private:
             if (!landing_)
             {
                 land_start_ = last_ref_x_;                      // điểm bắt đầu hạ
+                land_heading_ = last_ref_b1_;                   // giữ hướng mũi cuối (circle_yaw: khác hướng cất cánh)
                 ground_ = land_start_;
                 ground_.z() = origin_.z() + BELOW_GROUND;       // NED: z lớn hơn = thấp hơn
                 landing_ = true;
@@ -293,7 +319,7 @@ private:
             // Dùng lại đa thức cất cánh nhưng chạy NGƯỢC thời gian (từ đỉnh về đất).
             // Đảo thời gian thì đạo hàm bậc lẻ (v, jerk) đổi dấu.
             const double tau = t - t_land;
-            ref = reference_takeoff(LAND_TIME - tau, ground_, heading_, ground_.z() - land_start_.z(), LAND_TIME);
+            ref = reference_takeoff(LAND_TIME - tau, ground_, land_heading_, ground_.z() - land_start_.z(), LAND_TIME);
             ref.v = -ref.v;
             ref.j = -ref.j;
             stage = 4;   // ghi CSV: đoạn hạ cánh
@@ -324,6 +350,7 @@ private:
             }
         }
         last_ref_x_ = ref.x;
+        last_ref_b1_ = ref.b1;
 
         // 5. Bộ điều khiển đã chọn: trạng thái + tham chiếu → lực f, mômen M.
         // Tích phân từ lúc bắt đầu cất cánh (stage 7) để khử lệch trước khi bay Case I.
@@ -402,6 +429,9 @@ private:
     X500Actuators motors_;
     P01State state_;
     Vector3 origin_ = Vector3::Zero(), heading_ = Vector3::UnitX();
+    Vector3 land_heading_ = Vector3::UnitX(), last_ref_b1_ = Vector3::UnitX();
+    double circ_r_ = 1.0, circ_period_ = 10.0, circ_duration_ = 24.0, yaw_offset_ = 0.0, yaw_period_ = 40.0;
+    int circ_laps_ = 2;
     uint64_t sample_ = 0;
     bool have_odom_ = false, sent_offboard_ = false, sent_arm_ = false;
     bool landing_ = false, sent_disarm_ = false;

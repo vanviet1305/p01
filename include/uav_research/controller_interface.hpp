@@ -1,5 +1,5 @@
 #pragma once
-// GIAO DIỆN CHUNG CHO CÁC BỘ ĐIỀU KHIỂN (P01, P02, sau này P06, P11).
+// GIAO DIỆN CHUNG CHO CÁC BỘ ĐIỀU KHIỂN (P01, P02, P06, P11).
 // Mọi bộ nhận CÙNG trạng thái (P01State), CÙNG tham chiếu (P01Reference), CÙNG tham số UAV (P01Parameters)
 // và trả về lực f + mômen M (P01Control). Node uav_simple chỉ gọi qua giao diện này,
 // nên phân bổ rotor, quỹ đạo, ghi CSV là chung → so sánh công bằng giữa các bài.
@@ -8,6 +8,9 @@
 
 #include "uav_research/p01_geometric_controller.hpp"
 #include "uav_research/p02_controller.hpp"
+#include "uav_research/p06_p11_controller.hpp"
+#include <cmath>
+#include <cstdio>
 #include <memory>
 #include <ostream>
 #include <stdexcept>
@@ -91,5 +94,69 @@ private:
     bool use_integral_ = true;
     P02Controller ctrl_;
     P02Control last_;
+};
+// ===== P06 (decoupled = false) và P11 (decoupled = true): thích nghi hình học, xem p06_p11_controller.hpp =====
+// θ̄_x, θ̄_R chỉ cập nhật khi node cho phép (integrate), đứng yên ở giai đoạn khác; xóa khi chạm đất.
+class AdaptiveCtrl : public Controller
+{
+public:
+    AdaptiveCtrl(bool decoupled, const AdaptiveGains &g) : decoupled_(decoupled), g_(g), ctrl_(decoupled) {}
+
+    std::string name() const override { return decoupled_ ? "p11" : "p06"; }
+    void reset() override { ctrl_.reset(); }
+
+    P01Control compute(const P01State &state, const P01Parameters &p,
+                       const P01Reference &r, double dt, bool integrate) override
+    {
+        last_ = ctrl_.compute(state, p, g_, r, dt, integrate);
+        return last_;
+    }
+
+    std::string csv_header() const override
+    {
+        return ",thx_x,thx_y,thx_z,thR_x,thR_y,thR_z,eR_x,eR_y,eR_z,eb_x,eb_y,eb_z,ey,ewy";
+    }
+    void csv_row(std::ostream &o) const override
+    {
+        for (int i = 0; i < 3; ++i) o << ',' << last_.theta_x[i];
+        for (int i = 0; i < 3; ++i) o << ',' << last_.theta_R[i];
+        for (int i = 0; i < 3; ++i) o << ',' << last_.eR[i];
+        for (int i = 0; i < 3; ++i) o << ',' << last_.eb[i];
+        o << ',' << last_.ey << ',' << last_.ewy;
+    }
+    std::string status() const override
+    {
+        char b[96];
+        std::snprintf(b, sizeof b, " thx=(%.2f,%.2f,%.2f)", last_.theta_x.x(), last_.theta_x.y(), last_.theta_x.z());
+        return b;
+    }
+    std::string describe() const override
+    {
+        char b[160];
+        std::snprintf(b, sizeof b, "gamma_x=%.3f gamma_R=%.3f B_theta_x=%.1f c1=%.3f c2=%.3f c3=%.3f",
+                      g_.gamma_x, g_.gamma_R, g_.B_theta_x, g_.c1, g_.c2, g_.c3);
+        return b;
+    }
+
+    // Giá trị c1, c2, c3 mặc định theo điều kiện của bài (P06 (31)–(32) dạng mã tác giả; P11 (71) cho c3).
+    static AdaptiveGains default_gains(const P01Parameters &p)
+    {
+        AdaptiveGains g;
+        g.c1 = std::min(std::sqrt(p.kx / p.m), 4.0 * p.kx * p.kv / (p.kv * p.kv + 4.0 * p.m * p.kx));
+        const double kR = p.attitude_scale.x(), kW = p.rate_scale.x(), J1 = p.J(0, 0), B2 = 1.0;
+        g.c2 = std::min(std::sqrt(kR / J1), 4.0 * kR * kW / ((kW + J1 * B2) * (kW + J1 * B2) + 4.0 * J1 * kR));
+        const double ky = p.attitude_scale.z(), kwy = p.rate_scale.z(), J3 = p.J(2, 2);
+        g.c3 = std::min(std::sqrt(ky / J3), 4.0 * ky * kwy / (kwy * kwy + 4.0 * J3 * ky));
+        g.gamma_x = 2.0;
+        g.gamma_R = 0.5;
+        g.B_theta_x = 10.0;
+        return g;
+    }
+
+private:
+    bool decoupled_;
+    AdaptiveGains g_;
+    AdaptiveGeometricController ctrl_;
+    AdaptiveControl last_;
 };
 } // namespace uav_research
