@@ -19,7 +19,7 @@ from collections import defaultdict
 import numpy as np
 
 THU_MUC = os.environ.get("MA_TRAN_DIR", os.path.expanduser("~/báo/06_ket_qua (log, đồ thị Gazebo)/gazebo_logs/ma_tran_x650"))
-MAU = re.compile(r"x650_(p01|p02|p06c|p06|p11)_(c1(?:x\d+)?_(?:dung|m26|k11|tai05|gio|mom)(?:_ekf)?|tron_yaw(?:_ekf)?)_g(\d+)\.csv$")
+MAU = re.compile(r"x650_(p01|p02|p06c|p06|p11g[xR]\d+|p11|p02ki\d+)_(c1(?:x\d+)?_(?:dung|m26|k11|tai05|gio|mom)(?:_ekf)?|tron_yaw(?:_ekf)?)_g(\d+)\.csv$")
 
 
 def doc(duong_dan):
@@ -132,13 +132,13 @@ def main():
         for h in tb:
             w.writerow({k: (round(v, 3) if isinstance(v, float) else v) for k, v in h.items()})
 
-    print(f"{'kịch bản':12s} {'bộ':5s} {'n':>2s} {'RMS TB ± ĐLC (cm)':>18s} {'max TB':>7s} {'bão hòa':>8s} {'Ψ hội tụ (s)':>12s} {'θ cuối (°)':>10s} {'σMz cuối':>9s}"
+    print(f"{'kịch bản':12s} {'bộ':7s} {'n':>2s} {'RMS TB ± ĐLC (cm)':>18s} {'max TB':>7s} {'bão hòa':>8s} {'Ψ hội tụ (s)':>12s} {'θ cuối (°)':>10s} {'σMz cuối':>9s}"
           f" {'5s sau nhiễu RMS/max':>21s} {'sau đó RMS':>11s} {'‖θ̄x‖/‖θ̄R‖ cuối':>17s}")
     for h in tb:
         nh = "" if np.isnan(h["rms_5s_sau_nhieu_tb_cm"]) else \
             f" {h['rms_5s_sau_nhieu_tb_cm']:10.2f}/{h['max_5s_sau_nhieu_tb_cm']:<10.2f} {h['rms_sau_5s_tb_cm']:11.2f}" + \
             ("" if np.isnan(h["thR_cuoi_tb"]) else f" {h['thx_cuoi_tb']:8.2f}/{h['thR_cuoi_tb']:<8.3f}")
-        print(f"{h['kich_ban']:12s} {h['bdk']:5s} {h['so_lan']:2d} {h['rms_tb_cm']:9.2f} ± {h['rms_dlc_cm']:5.2f}"
+        print(f"{h['kich_ban']:12s} {h['bdk']:7s} {h['so_lan']:2d} {h['rms_tb_cm']:9.2f} ± {h['rms_dlc_cm']:5.2f}"
               f" {h['max_tb_cm']:7.2f} {h['bao_hoa_tb']:8.0f} {h['psi_hoi_tu_tb_s']:12.1f} {h['goc_cuoi_max_tb_deg']:10.2f} {h['Mz_cuoi_dlc_tb']:9.3f}{nh}")
     print("Đã ghi tong_hop_tung_lan.csv, tong_hop_trung_binh.csv trong", THU_MUC)
 

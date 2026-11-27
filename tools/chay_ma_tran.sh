@@ -43,9 +43,14 @@ THU_TU_KB=${KICH_BAN:-"${TEN_C1}_dung ${TEN_C1}_m26 ${TEN_C1}_k11 tron_yaw ${TEN
 #   p06c = P06 với c2 = 1,96 (= c3 của trục yaw). c2 mặc định 5,06 tính theo trục roll (kR_x, J1) nhưng P06 dùng chung
 #   cho cả yaw → vòng thích nghi yaw tuyến tính có cặp cực 0,43 Hz, ζ = 0,07 (khớp dao động Mz 0,43 Hz đo trong tron_yaw).
 THU_TU_BDK=${BO:-"p01 p02 p06 p11"}
-ten_ctrl() { case "$1" in p06c) echo p06;; *) echo "$1";; esac; }
+#   p11gx05 / p11gx8: P11 với gamma_x 0,5 / 8 (mặc định 2); p11gR02 / p11gR2: P11 với gamma_R 0,2 / 2 (mặc định 0,5).
+#   p02ki8: P02 với ki = 8 (mặc định 1·m = 3), cùng hệ số tích phân lực với P11 gamma_x = 8 (so sánh công bằng).
+ten_ctrl() { case "$1" in p06c) echo p06;; p11g*) echo p11;; p02ki*) echo p02;; *) echo "$1";; esac; }
 # P06/P11: chặn ‖θ̄_R‖ ≤ 0,3 N.m (chống windup, xem NHAT_KY 25/11)
-them_bdk() { case "$1" in p06|p11) echo "-p B_theta_R:=0.3";; p06c) echo "-p B_theta_R:=0.3 -p c2:=1.96";; *) echo "";; esac; }
+them_bdk() { case "$1" in p06|p11) echo "-p B_theta_R:=0.3";; p06c) echo "-p B_theta_R:=0.3 -p c2:=1.96";;
+  p11gx05) echo "-p B_theta_R:=0.3 -p gamma_x:=0.5";;  p11gx8) echo "-p B_theta_R:=0.3 -p gamma_x:=8.0";;
+  p02ki8) echo "-p ki:=8.0";;
+  p11gR02) echo "-p B_theta_R:=0.3 -p gamma_R:=0.2";;  p11gR2) echo "-p B_theta_R:=0.3 -p gamma_R:=2.0";; *) echo "";; esac; }
 
 tong=$(( SO_LAN * $(echo $THU_TU_BDK | wc -w) * $(echo $THU_TU_KB | wc -w) )); dem=0
 for lan in $(seq 1 "$SO_LAN"); do
