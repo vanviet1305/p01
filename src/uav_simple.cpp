@@ -96,7 +96,11 @@ public:
             throw std::invalid_argument("vehicle phải là x500 hoặc x650");
         use_gt_ = declare_parameter<std::string>("state_source", "px4") == "gazebo";
         const std::string gt_topic = "/model/" + vehicle_ + "_0/odometry";
-        if (use_gt_ && !gt_.start(gt_topic))
+        // Luôn đăng ký topic Gazebo. state_source:=gazebo → dùng cho điều khiển.
+        // state_source:=px4 → CHỈ ghi CSV (cột gt_*) để đo sai số THẬT khi bộ điều khiển chạy bằng EKF2;
+        // không đưa vào bộ điều khiển. Chưa gắn odometry Gazebo thì các cột gt_* là nan.
+        const bool gt_ok = gt_.start(gt_topic);
+        if (use_gt_ && !gt_ok)
             RCLCPP_ERROR(get_logger(), "Không đăng ký được topic Gazebo %s", gt_topic.c_str());
         case1_duration_ = CASE1_RAMP + CASE1_PHASE / case1_speed_;   // 30 s ở 0,25×; 17 s ở 0,5×; 10,5 s ở 1×
         // Quỹ đạo số 8 (reference_mode:=figure8): dọc = a·sin θ, ngang = b·sin 2θ, θ = 2π·t/period.
@@ -225,7 +229,8 @@ public:
             log_.open(csv);
             log_ << "t,x,y,z,xd,yd,zd,position_error,Psi,f_requested,f_achieved,"
                     "Mx,My,Mz,Mx_achieved,My_achieved,Mz_achieved,u0,u1,u2,u3,saturated,stage,control_blend"
-                 << ctrl_->csv_header() << ",state_source_gazebo,ekf_x,ekf_y,ekf_z,ekf_tilt_err_deg,dist_active\n";
+                 << ctrl_->csv_header() << ",state_source_gazebo,ekf_x,ekf_y,ekf_z,ekf_tilt_err_deg,dist_active"
+                 << ",gt_x,gt_y,gt_z,gt_pos_err,gt_tilt_err_deg\n";
         }
 
         // 1 timer 100 Hz: TOÀN BỘ việc điều khiển nằm trong loop().
@@ -269,6 +274,14 @@ private:
 
         // 1b. Trạng thái thật từ Gazebo (state_source:=gazebo): thay x, v, R; giữ omega từ con quay PX4.
         //     Chưa có dữ liệu thì giữ đồng hồ node ở 0 (chưa cất cánh) và chờ.
+        // 1a. Chế độ EKF2: đọc trạng thái thật chỉ để ghi CSV (không dùng điều khiển).
+        if (!use_gt_)
+        {
+            Vector3 vg_log;
+            double age_log = 0.0;
+            have_gt_log_ = gt_.get(gt_x_, vg_log, gt_R_, age_log) && age_log < 0.2;
+        }
+
         if (use_gt_)
         {
             Vector3 xg, vg;
@@ -444,7 +457,22 @@ private:
             log_ << ',' << use_gt_;
             for (int i = 0; i < 3; ++i) log_ << ',' << px4_x_[i];
             log_ << ',' << std::acos(std::clamp(px4_R_.col(2).dot(state_.R.col(2)), -1.0, 1.0)) * 180.0 / M_PI
-                 << ',' << dist_active_ << '\n';
+                 << ',' << dist_active_;
+            // Trạng thái THẬT và sai số thật so với tham chiếu (gazebo: trùng state_; px4: từ Gazebo nếu có, không thì nan).
+            if (use_gt_)
+            {
+                for (int i = 0; i < 3; ++i) log_ << ',' << state_.x[i];
+                log_ << ',' << (state_.x - ref.x).norm() << ",0";
+            }
+            else if (have_gt_log_)
+            {
+                for (int i = 0; i < 3; ++i) log_ << ',' << gt_x_[i];
+                log_ << ',' << (gt_x_ - ref.x).norm() << ','
+                     << std::acos(std::clamp(gt_R_.col(2).dot(state_.R.col(2)), -1.0, 1.0)) * 180.0 / M_PI;
+            }
+            else
+                log_ << ",nan,nan,nan,nan,nan";
+            log_ << '\n';
         }
     }
 
@@ -480,6 +508,9 @@ private:
     bool use_dist_ = false, dist_active_ = false, dist_done_ = false;
     Vector3 px4_x_ = Vector3::Zero();          // vị trí EKF2 (ghi CSV để so với trạng thái thật)
     Matrix3 px4_R_ = Matrix3::Identity();      // tư thế EKF2
+    bool have_gt_log_ = false;                 // chế độ EKF2: có trạng thái thật để ghi CSV
+    Vector3 gt_x_ = Vector3::Zero();           // vị trí thật (chỉ ghi CSV)
+    Matrix3 gt_R_ = Matrix3::Identity();       // tư thế thật (chỉ ghi CSV)
     Vector3 return_from_ = Vector3::Zero();
     std::string vehicle_;
     double att_bw_scale_ = 1.0;

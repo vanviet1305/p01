@@ -19,7 +19,7 @@ from collections import defaultdict
 import numpy as np
 
 THU_MUC = os.environ.get("MA_TRAN_DIR", os.path.expanduser("~/báo/06_ket_qua (log, đồ thị Gazebo)/gazebo_logs/ma_tran_x650"))
-MAU = re.compile(r"x650_(p01|p02|p06c|p06|p11)_(c1(?:x\d+)?_(?:dung|m26|k11|tai05|gio|mom)|tron_yaw)_g(\d+)\.csv$")
+MAU = re.compile(r"x650_(p01|p02|p06c|p06|p11)_(c1(?:x\d+)?_(?:dung|m26|k11|tai05|gio|mom)(?:_ekf)?|tron_yaw(?:_ekf)?)_g(\d+)\.csv$")
 
 
 def doc(duong_dan):
@@ -27,7 +27,13 @@ def doc(duong_dan):
         r = csv.reader(f)
         cot = next(r)
         so = np.array([[float(v) for v in dong] for dong in r if len(dong) == len(cot)])
-    return {c: so[:, i] for i, c in enumerate(cot)}
+    d = {c: so[:, i] for i, c in enumerate(cot)}
+    # Chuyến chạy bằng EKF2 (state_source_gazebo = 0): đo bằng sai số THẬT (cột gt_pos_err), giữ sai số theo EKF2
+    # ở cột position_error_ekf. Chuyến cũ không có cột gt_* thì giữ nguyên.
+    if "gt_pos_err" in d and "state_source_gazebo" in d and (d["state_source_gazebo"] < 0.5).all():
+        d["position_error_ekf"] = d["position_error"]
+        d["position_error"] = d["gt_pos_err"]
+    return d
 
 
 def chi_so(d, kb):

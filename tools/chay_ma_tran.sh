@@ -34,6 +34,9 @@ KB[${TEN_C1}_gio]="-p reference_mode:=case1 -p case1_speed:=$TOC_DO -p dist_fx:=
 # Mômen nhiễu hằng 0,2 N.m quanh trục x (Bắc) của thế giới từ t = 15 s (≈ khối tâm lệch 6,8 mm: 0,2 / (3,0·9,81)).
 # Chọn < B_theta_R 0,3 để phép chiếu chống windup không cắt ước lượng θ̄_R. Hướng mũi Case I cố định nên tương đương mômen hệ thân.
 KB[${TEN_C1}_mom]="-p reference_mode:=case1 -p case1_speed:=$TOC_DO -p dist_tx:=0.2 -p dist_t_on:=15.0"
+# Ca *_ekf: giống ca gốc nhưng bộ điều khiển dùng EKF2 (state_source:=px4); sai số thật ghi ở cột gt_pos_err.
+for k in "${!KB[@]}"; do KB[${k}_ekf]="${KB[$k]}"; done
+nguon() { case "$1" in *_ekf) echo px4;; *) echo gazebo;; esac; }
 # tron_yaw không phụ thuộc TOC_DO: đã có đủ 3 lần thì được bỏ qua.
 THU_TU_KB=${KICH_BAN:-"${TEN_C1}_dung ${TEN_C1}_m26 ${TEN_C1}_k11 tron_yaw ${TEN_C1}_tai05 ${TEN_C1}_gio"}
 # BO: chọn bộ điều khiển, ví dụ BO="p06c" bash …/chay_ma_tran.sh
@@ -56,7 +59,7 @@ for lan in $(seq 1 "$SO_LAN"); do
       echo "[$dem/$tong] $(date +%H:%M:%S) Bay $csv"
       # shellcheck disable=SC2046
       timeout --signal=INT 120 ros2 run p01 uav_simple --ros-args -p controller:=$(ten_ctrl "$bdk") -p vehicle:=x650 \
-        -p state_source:=gazebo ${KB[$kb]} $(them_bdk "$bdk") -p log_csv:="$csv" > "${csv%.csv}.log" 2>&1
+        -p state_source:=$(nguon "$kb") ${KB[$kb]} $(them_bdk "$bdk") -p log_csv:="$csv" > "${csv%.csv}.log" 2>&1
       ma=$?
       # Kiểm tra đã cất cánh thật: trong đoạn bay (stage 3) sai số vị trí phải < 1 m.
       # (25/11/2026: PX4 từ chối arm nhưng node vẫn chạy hết và ghi CSV sai, UAV nằm dưới đất, ex = 2 m.)
