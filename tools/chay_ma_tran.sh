@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# CHẠY TỰ ĐỘNG MA TRẬN THÍ NGHIỆM trên x650: 4 bộ điều khiển × 4 kịch bản × SO_LAN lần (trạng thái thật).
+# CHẠY TỰ ĐỘNG MA TRẬN THÍ NGHIỆM trên x650: 4 bộ điều khiển (BO) × các kịch bản × SO_LAN lần (trạng thái thật).
 # Mặc định Case I 0,5× (TOC_DO=1.0 để chạy bộ 1×).
 # Cách dùng (tab node bay, đã source ~/ros2_px4_ws/install/setup.bash; Agent + PX4 gz_x650 đã chạy, thấy "Ready for takeoff!"):
 #   bash ~/ros2_px4_ws/src/p01/tools/chay_ma_tran.sh            # mặc định 3 lần
@@ -31,13 +31,20 @@ KB[tron_yaw]="-p reference_mode:=circle_yaw"
 # Nhiễu ngoài đổi giữa chuyến (Gazebo ApplyLinkWrench; quỹ đạo Case I chạy từ t = 10 s): bật tại t = 15 s, giữ tới lúc hạ.
 KB[${TEN_C1}_tai05]="-p reference_mode:=case1 -p case1_speed:=$TOC_DO -p payload_kg:=0.5 -p dist_t_on:=15.0"
 KB[${TEN_C1}_gio]="-p reference_mode:=case1 -p case1_speed:=$TOC_DO -p dist_fx:=2.0 -p dist_t_on:=15.0"
+# Mômen nhiễu hằng 0,2 N.m quanh trục x (Bắc) của thế giới từ t = 15 s (≈ khối tâm lệch 6,8 mm: 0,2 / (3,0·9,81)).
+# Chọn < B_theta_R 0,3 để phép chiếu chống windup không cắt ước lượng θ̄_R. Hướng mũi Case I cố định nên tương đương mômen hệ thân.
+KB[${TEN_C1}_mom]="-p reference_mode:=case1 -p case1_speed:=$TOC_DO -p dist_tx:=0.2 -p dist_t_on:=15.0"
 # tron_yaw không phụ thuộc TOC_DO: đã có đủ 3 lần thì được bỏ qua.
 THU_TU_KB=${KICH_BAN:-"${TEN_C1}_dung ${TEN_C1}_m26 ${TEN_C1}_k11 tron_yaw ${TEN_C1}_tai05 ${TEN_C1}_gio"}
-THU_TU_BDK="p01 p02 p06 p11"
+# BO: chọn bộ điều khiển, ví dụ BO="p06c" bash …/chay_ma_tran.sh
+#   p06c = P06 với c2 = 1,96 (= c3 của trục yaw). c2 mặc định 5,06 tính theo trục roll (kR_x, J1) nhưng P06 dùng chung
+#   cho cả yaw → vòng thích nghi yaw tuyến tính có cặp cực 0,43 Hz, ζ = 0,07 (khớp dao động Mz 0,43 Hz đo trong tron_yaw).
+THU_TU_BDK=${BO:-"p01 p02 p06 p11"}
+ten_ctrl() { case "$1" in p06c) echo p06;; *) echo "$1";; esac; }
 # P06/P11: chặn ‖θ̄_R‖ ≤ 0,3 N.m (chống windup, xem NHAT_KY 25/11)
-them_bdk() { case "$1" in p06|p11) echo "-p B_theta_R:=0.3";; *) echo "";; esac; }
+them_bdk() { case "$1" in p06|p11) echo "-p B_theta_R:=0.3";; p06c) echo "-p B_theta_R:=0.3 -p c2:=1.96";; *) echo "";; esac; }
 
-tong=$(( SO_LAN * 4 * $(echo $THU_TU_KB | wc -w) )); dem=0
+tong=$(( SO_LAN * $(echo $THU_TU_BDK | wc -w) * $(echo $THU_TU_KB | wc -w) )); dem=0
 for lan in $(seq 1 "$SO_LAN"); do
   for kb in $THU_TU_KB; do
     for bdk in $THU_TU_BDK; do
@@ -48,7 +55,7 @@ for lan in $(seq 1 "$SO_LAN"); do
       fi
       echo "[$dem/$tong] $(date +%H:%M:%S) Bay $csv"
       # shellcheck disable=SC2046
-      timeout --signal=INT 120 ros2 run p01 uav_simple --ros-args -p controller:=$bdk -p vehicle:=x650 \
+      timeout --signal=INT 120 ros2 run p01 uav_simple --ros-args -p controller:=$(ten_ctrl "$bdk") -p vehicle:=x650 \
         -p state_source:=gazebo ${KB[$kb]} $(them_bdk "$bdk") -p log_csv:="$csv" > "${csv%.csv}.log" 2>&1
       ma=$?
       # Kiểm tra đã cất cánh thật: trong đoạn bay (stage 3) sai số vị trí phải < 1 m.

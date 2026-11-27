@@ -153,7 +153,7 @@ public:
         // NHIỄU NGOÀI (Gazebo ApplyLinkWrench, xem gz_wrench.hpp): lực/mômen hằng bật tại t = dist_t_on, tắt tại
         // dist_t_off (t tính từ lúc bắt đầu cất cánh, như CSV). Hệ NED thế giới: dist_fz > 0 = kéo xuống.
         // payload_kg: tiện dùng, cộng payload_kg·g vào dist_fz (chỉ trọng lượng, không có khối lượng quán tính).
-        // dist_t_on < 0 = tắt (mặc định). Nhiễu GIỮ NGUYÊN qua cả lúc hạ cánh, chỉ xóa khi node kết thúc
+        // dist_t_on < 0 = tắt (mặc định). Nhiễu GIỮ NGUYÊN qua cả lúc hạ cánh, chỉ xóa khi đã chạm đất
         // (25/11/2026: trước đây xóa lúc bắt đầu hạ → tích phân P02 / θ̄ đang giữ bù lực cũ (ngừng cập nhật khi hạ)
         //  và P01 mất lệch cố định → UAV vọt lên ~40 cm hoặc trôi ngang ~35 cm khi hạ cánh).
         {
@@ -371,6 +371,9 @@ private:
                 ctrl_->reset();
                 reset_on_ground_ = true;
                 RCLCPP_INFO(get_logger(), "Chạm đất: xóa trạng thái bên trong bộ điều khiển trước khi disarm");
+                // Xóa nhiễu ngoài khi đã chạm đất: không còn thử bộ điều khiển; lực ngang để lại sẽ đẩy UAV trượt trên mặt đất
+                // (đo 25/11: gió 2 N làm UAV trượt ~50 cm sau khi chạm đất).
+                if (dist_active_) { wrench_.clear(); dist_active_ = false; dist_done_ = true; RCLCPP_INFO(get_logger(), "Tắt nhiễu ngoài (đã chạm đất)"); }
             }
 
             // Chạm đất xong 2 s thì disarm, thêm 1 s thì tắt node.
