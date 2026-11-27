@@ -30,9 +30,15 @@ def doc(duong_dan):
     d = {c: so[:, i] for i, c in enumerate(cot)}
     # Chuyến chạy bằng EKF2 (state_source_gazebo = 0): đo bằng sai số THẬT (cột gt_pos_err), giữ sai số theo EKF2
     # ở cột position_error_ekf. Chuyến cũ không có cột gt_* thì giữ nguyên.
+    # Bỏ lệch khung GT − EKF đo lúc còn trên đất (stage 0): quỹ đạo đặt tương đối điểm cất cánh nên lệch khung
+    # cố định này không làm UAV bay sai; chỉ phần EKF trôi/nhiễu SAU khi cất cánh mới là sai số thật (sửa 27/11).
     if "gt_pos_err" in d and "state_source_gazebo" in d and (d["state_source_gazebo"] < 0.5).all():
         d["position_error_ekf"] = d["position_error"]
-        d["position_error"] = d["gt_pos_err"]
+        G = np.column_stack([d["gt_x"], d["gt_y"], d["gt_z"]])
+        K = np.column_stack([d["x"], d["y"], d["z"]])
+        lech = (G - K)[d["stage"] == 0].mean(axis=0)
+        d["lech_khung_z_cm"] = np.full(len(G), lech[2] * 100.0)
+        d["position_error"] = np.linalg.norm(G - lech - np.column_stack([d["xd"], d["yd"], d["zd"]]), axis=1)
     return d
 
 
